@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views import deviceuser_form_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+     path('deviceuser/form/', deviceuser_form_view, name='deviceuser_form'),
 ]

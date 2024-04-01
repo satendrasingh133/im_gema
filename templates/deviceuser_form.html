@@ -1,0 +1,29 @@
+<!-- deviceuser_form.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device User Form</title>
+</head>
+<body>
+    <h1>Device User Form</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" value="{{ deviceuser.name }}"><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" value="{{ deviceuser.email }}"><br>
+        <label for="contact_no">Contact No:</label><br>
+        <input type="text" id="contact_no" name="contact_no" value="{{ deviceuser.contact_no }}"><br>
+        <label for="address">Address:</label><br>
+        <textarea id="address" name="address">{{ deviceuser.address }}</textarea><br>
+        <label for="pincode">Pincode:</label><br>
+        <input type="text" id="pincode" name="pincode" value="{{ deviceuser.pincode }}"><br>
+        <label for="state">State:</label><br>
+        <input type="text" id="state" name="state" value="{{ deviceuser.state }}"><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
