@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block body %}
+<script>
+    $(function() {
+        if($('#type').val()!==""){
+            $('#inventryForm').show();
+        }
+        $('select#type').change(function(){
+            var selectedOption = $(this).children("option:selected").val();
+            if(selectedOption === 'laptop' || selectedOption === 'adapter') {
+                $('#inventryForm').show();
+            } else {
+                $('#inventryForm').hide();
+            }
+            if(selectedOption === 'laptop'){
+                $('#name').val("Macbook Pro");
+            }else{
+                $('#name').val("Multiport Adapter");
+            }
+        });
+    });
+</script>
+<div class="mt-5 mb-5" >
+<h2 class="mb-3">Add inventry</h2>
+{% if error_message %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{error_message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+{% if success_message %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ success_message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+<form method="POST" action="/addinventry/">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-6">
+            <label class="form-label">Type</label>
+            <select class="form-select" name="type" id="type" aria-label="type">
+              <option selected value="">Please select</option>
+              <option {% if type == "laptop" %} selected {% endif %} value="laptop">Laptop</option>
+              <option {% if type == "adapter" %} selected {% endif %} value="adapter">Adapter</option>
+            </select>
+        </div>
+    </div>
+    <div id="inventryForm" class="mt-4" style="display: none">
+        <div class="row">
+            <div class="col-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" {% if name != "" %} value="{{ name }}" {% endif %} id="name" aria-describedby="nameHelp">
+
+            </div>
+            <div class="col-6">
+                <label for="serial_number" class="form-label">Serial number</label>
+                <input type="text" class="form-control" name="serial_number" {% if serial_number != "" %} value="{{ serial_number }}" {% endif %} id="serial_number" aria-describedby="snumberHelp">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mt-3">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+
+{% endblock body %}

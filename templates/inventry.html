@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block body %}
+<script>
+    $(function() {
+        if($('#type').val()!==""){
+            $('#inventryForm').show();
+        }
+        $('select#type').change(function(){
+            var selectedOption = $(this).children("option:selected").val();
+            if(selectedOption === 'laptop' || selectedOption === 'adapter') {
+                $('#inventryForm').show();
+            } else {
+                $('#inventryForm').hide();
+            }
+            if(selectedOption === 'laptop'){
+                $('#name').val("Macbook Pro");
+            }else{
+                $('#name').val("Multiport Adapter");
+            }
+        });
+    });
+</script>
+<div class="mt-5 mb-5" >
+    <h2 class="mb-3">Add inventry</h2>
+</div>
+
+{% endblock body %}
