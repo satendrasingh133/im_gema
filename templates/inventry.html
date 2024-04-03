@@ -13,7 +13,10 @@
     }
 </script>
 <div class="mt-5 mb-5" >
-    <h2 class="mb-3">Add inventry</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Inventry Overview</h2>
+        <a href="/addinventry/" class="btn btn-primary">Add inventry</a>
+    </div>
     {% if success_message %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
           {{ success_message }}

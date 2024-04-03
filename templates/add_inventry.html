@@ -39,7 +39,7 @@
     {% csrf_token %}
     <div class="row">
         <div class="col-6">
-            <label class="form-label">Type</label>
+            <label class="form-label">Type <span class="text-danger">*</span></label>
             <select class="form-select" name="type" id="type" aria-label="type">
               <option selected value="">Please select</option>
               <option {% if type == "laptop" %} selected {% endif %} value="laptop">Laptop</option>
@@ -50,12 +50,12 @@
     <div id="inventryForm" class="mt-4" style="display: none">
         <div class="row">
             <div class="col-6">
-                <label for="name" class="form-label">Name</label>
+                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                 <input type="text" required class="form-control" name="name" {% if name != "" %} value="{{ name }}" {% endif %} id="name" aria-describedby="nameHelp">
 
             </div>
             <div class="col-6">
-                <label for="serial_number" class="form-label">Serial number</label>
+                <label for="serial_number" class="form-label">Serial number <span class="text-danger">*</span></label>
                 <input type="text" required class="form-control" name="serial_number" {% if serial_number != "" %} value="{{ serial_number }}" {% endif %} id="serial_number" aria-describedby="snumberHelp">
             </div>
         </div>

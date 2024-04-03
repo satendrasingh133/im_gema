@@ -1,28 +1,108 @@
 {% extends 'base.html' %}
 {% block body %}
 <script>
-    $(function() {
+    $(document).ready(function() {
+    // List of Indian states
+    var indianStates = [
+        "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+        "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
+        "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+        "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Ladakh", "Lakshadweep", "Puducherry"
+    ];
 
+    // Populate select dropdown with Indian states
+    var stateSelect = $('#state');
+    $.each(indianStates, function(index, state) {
+        stateSelect.append($('<option>', {
+            value: state,
+            text: state
+        }));
     });
-</script>
-<div class="mt-5 mb-5" >
-    <h1>Device User Form</h1>
-    <form method="POST" action="/adddeviceuser/">
-        {% csrf_token %}
-        <label for="name">Name:</label><br>
-        <input type="text" id="name" name="name" value="{{ deviceuser.name }}"><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" value="{{ deviceuser.email }}"><br>
-        <label for="contact_no">Contact No:</label><br>
-        <input type="text" id="contact_no" name="contact_no" value="{{ deviceuser.contact_no }}"><br>
-        <label for="address">Address:</label><br>
-        <textarea id="address" name="address">{{ deviceuser.address }}</textarea><br>
-        <label for="pincode">Pincode:</label><br>
-        <input type="text" id="pincode" name="pincode" value="{{ deviceuser.pincode }}"><br>
-        <label for="state">State:</label><br>
-        <input type="text" id="state" name="state" value="{{ deviceuser.state }}"><br>
-        <input type="submit" value="Submit">
-    </form>
-</div>
 
+    // Initialize Select2 plugin
+
+    var deviceUserState = '{{ deviceuser.state }}';
+    if(deviceUserState){
+        stateSelect.val(deviceUserState).trigger('change');
+    }else{
+        stateSelect.select2({
+            placeholder: 'Select State',
+            allowClear: true
+        });
+    }
+});
+</script>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="text-center mb-4">Device User Form</h1>
+            {% if error_message %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{error_message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                {% if success_message %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ success_message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+                {{user_id}}
+                <form method="POST" id="myForm" action="{% if deviceuser.id %}{% url 'edit_user' deviceuser.id %}{% else %}{% url 'add_deviceuser' %}{% endif %}" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Name <span class="text-danger">*</span></label>
+                        <input type="text" id="name" required name="name" class="form-control {% if error_message %}is-invalid{% endif %}" {% if deviceuser.name %} value="{{ deviceuser.name }}" {% endif %}>
+                        {% if error_message_name %}
+                            <div class="alert-danger alert-dismissible fade show mt-1 mb-1 p-1"> {{ error_message_name }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email <span class="text-danger">*</span></label>
+                        <input type="email" id="email" name="email" class="form-control {% if error_message %}is-invalid{% endif %}" {% if deviceuser.email %} value="{{ deviceuser.email }}" {% endif %} required>
+                        {% if error_message_email %}
+                            <div class="alert-danger alert-dismissible fade show mt-1 mb-1 p-1"> {{ error_message_email }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_no">Contact No <span class="text-danger">*</span></label>
+                        <input id="contact_no" name="contact_no" type="number" maxlength="10" class="form-control {% if error_message %}is-invalid{% endif %}" {% if deviceuser.contact_no %} value="{{ deviceuser.contact_no }}" {% endif %} required>
+                        {% if error_message_contact_no %}
+                            <div class="alert-danger alert-dismissible fade show mt-1 mb-1"> {{ error_message_contact_no }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address <span class="text-danger">*</span></label>
+                        <textarea id="address" name="address" class="form-control {% if error_message %}is-invalid{% endif %}" required>{% if deviceuser.address %}{{ deviceuser.address }}{% endif %}</textarea>
+                        {% if error_message_address %}
+                            <div class="alert-danger alert-dismissible fade show mt-1 mb-1 p-1"> {{ error_message_address }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode <span class="text-danger">*</span></label>
+                        <input id="pincode" name="pincode" type="number" maxlength="6" class="form-control {% if error_message %}is-invalid{% endif %}" {% if deviceuser.pincode %} value="{{ deviceuser.pincode }}" {% endif %} required>
+                        {% if error_message_pincode %}
+                            <div class="alert-danger alert-dismissible fade show mt-1 mb-1 p-1"> {{ error_message_pincode }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State <span class="text-danger">*</span></label>
+                        <select id="state" name="state" class="form-control p-3 {% if error_message %}is-invalid{% endif %}" required>
+                            <option value="">Select State</option>
+                        </select>
+                        {% if error_message_state %}
+                            <div class="alert-danger alert-dismissible fade show mt-1 mb-1 p-1"> {{ error_message_state }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-5">Submit</button>
+                </form>
+
+
+        </div>
+    </div>
+</div>
 {% endblock body %}
