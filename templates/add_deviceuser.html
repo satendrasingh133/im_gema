@@ -19,11 +19,22 @@
             }));
         });
     
-        // Initialize Select2 plugin
-        stateSelect.select2({
-            placeholder: 'Select State',
-            allowClear: true
-        });
+       
+
+        var deviceUserState = '{{ deviceuser.state }}';
+            if(deviceUserState){
+                stateSelect.val(deviceUserState).trigger('change');
+            }else{
+                stateSelect.select2({
+                    placeholder: 'Select State',
+                    allowClear: true
+                });
+            }
+
+
+
+
+
     });
 </script>
     
@@ -46,7 +57,7 @@
                 {% endif %}
             <!-- <form method="POST" action="/adddeviceuser/" class="needs-validation" novalidate> -->
                
-                <form method="POST" action="{% if user %}{% url 'edit_user' user.id %}{% else %}{% url 'create_deviceuser' %}{% endif %}" class="needs-validation" novalidate>
+                <form method="POST" action="{% if deviceuser.id %}{% url 'edit_user' deviceuser.id %}{% else %}{% url 'add_deviceuser' %}{% endif %}" class="needs-validation" novalidate>
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="name">Name:</label>
@@ -86,10 +97,8 @@
                     <div class="form-group">
                         <label for="state">State:</label>
                         <select id="state" name="state" class="form-control p-3 {% if error_message %}is-invalid{% endif %}" required>
-                            <option value="">Select State</option>                           
-                            {% for state in indian_states %}
-                                <option value="{{ state }}" {% if deviceuser.state == state %} selected {% endif %}>{{ state }}</option>
-                            {% endfor %}
+                            <option value="">Select State</option>                          
+                        
                         </select>
                         {% if error_message_state %}
                             <div class="alert-danger alert-dismissible fade show mt-1 mb-1 p-1"> {{ error_message_state }}</div>
