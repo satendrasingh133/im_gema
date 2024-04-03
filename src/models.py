@@ -1,6 +1,6 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
-# Create your models here.
 class Inventry(models.Model):
     type = models.CharField(max_length=122)
     name = models.CharField(max_length=122)
@@ -14,8 +14,8 @@ class Inventry(models.Model):
 
 class DeviceUser(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField()
-    contact_no = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)  # Ensure email uniqueness
+    contact_no = models.CharField(max_length=20, validators=[RegexValidator(r'^\d{10}$', message='Phone number must be 10 digits.')], unique=True)  # Ensure phone number uniqueness
     address = models.TextField()
     pincode = models.CharField(max_length=10)
     state = models.CharField(max_length=100)
