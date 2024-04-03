@@ -1,8 +1,18 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from datetime import datetime
 from src.models import Inventry, DeviceUser
 
 # Create your views here.
+def list_inventry(request):
+    inventries = Inventry.objects.all()
+    return render(request, 'inventry.html', {'inventries': inventries})
+
+def get_inventry_by_id(request, inventry_id):
+    # Retrieve the inventory item by ID or return a 404 error if not found
+    inventry = get_object_or_404(Inventry, pk=inventry_id)
+
+    # Render the template and pass the inventory item to the context
+    return render(request, 'update_inventry.html', {'inventry': inventry})
 def add_inventry(request):
     if request.method == "POST":
         # Get the values from POST data
@@ -31,6 +41,32 @@ def add_inventry(request):
 
     return render(request, 'add_inventry.html')
 
+def update_inventry_data(request):
+    if request.method == 'POST':
+        inventry_id = request.POST.get('inventry_id')
+        # Retrieve the inventory item by ID or return a 404 error if not found
+        inventry = get_object_or_404(Inventry, pk=inventry_id)
+        type = request.POST.get('type')
+        name = request.POST.get('name')
+        serial_number = request.POST.get('serial_number')
+
+        # Update the inventory item with the submitted data
+        inventry.type = type
+        inventry.name = name
+        inventry.serial_no = serial_number
+        inventry.updated_at = datetime.today()
+        inventry.updated_by = request.user.username
+        inventry.save()
+        success_message = "Inventry updated successfully."
+        return redirect('list_inventry')
+
+    # Render the form template with the inventory item data
+    return render(request, 'update_inventry.html', {'inventry': inventry})
+
+def delete_inventry(request, inventry_id):
+    inventry = get_object_or_404(Inventry, pk=inventry_id)
+    inventry.delete()
+    return redirect('list_inventry')
 def create_deviceuser(request):
     if request.method == 'POST':
         name = request.POST.get('name')
