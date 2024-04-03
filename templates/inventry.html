@@ -11,17 +11,25 @@
             return false;
         }
     }
+    $(document).ready(function(){
+        setTimeout(function() {
+            var alertContainer = document.getElementById('alertContainer');
+            alertContainer.parentNode.removeChild(alertContainer);
+        }, 5000);
+    })
 </script>
 <div class="mt-5 mb-5" >
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Inventry Overview</h2>
         <a href="/addinventry/" class="btn btn-primary">Add inventry</a>
     </div>
-    {% if success_message %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {{ success_message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" id="alertContainer" role="alert">
+              {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
     {% endif %}
     <table class="table table-striped">
         <thead>

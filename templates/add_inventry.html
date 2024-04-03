@@ -56,7 +56,7 @@
             </div>
             <div class="col-6">
                 <label for="serial_number" class="form-label">Serial number <span class="text-danger">*</span></label>
-                <input type="text" required class="form-control" name="serial_number" {% if serial_number != "" %} value="{{ serial_number }}" {% endif %} id="serial_number" aria-describedby="snumberHelp">
+                <input type="text" required class="form-control" name="serial_number" {% if serial_number != "" %} value="{{ serial_number }}" {% endif %} id="serial_number" oninput="this.value = this.value.toUpperCase()" aria-describedby="snumberHelp">
             </div>
         </div>
         <div class="row">
