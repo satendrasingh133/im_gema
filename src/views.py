@@ -1,11 +1,22 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from datetime import datetime
-from src.models import Inventry, DeviceUser
+from src.models import Inventry, DeviceUser, MacbookInventry
 import re
 from django.contrib import messages
 from django.contrib.auth import logout
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 
 # Create your views here.
+def dashboard(request):
+    if request.user.is_anonymous:
+        return redirect("/admin")
+    return render(request, 'dashboard.html')
+def logout_view(request):
+    logout(request)
+    # Redirect to a page after logout
+    return redirect("/admin")
 def list_inventry(request):
     if request.user.is_anonymous:
         return redirect("/admin")
@@ -155,7 +166,8 @@ def create_deviceuser(request):
             address=address.lstrip().rstrip(),
             pincode=pincode,
             state=state,
-            created_by=created_by
+            created_by=created_by,
+            status=1
         )
         success_message = "User created successfully."
         messages.success(request, success_message)
@@ -242,6 +254,26 @@ def edit_user(request, user_id):
         return redirect('user_overview')
     return render(request, 'add_deviceuser.html', {'deviceuser': user})
 
+def assign_macbook(request):
+    if request.user.is_anonymous:
+        return redirect("/admin")
+    if request.method == "POST":
+        deviceuser_id = request.POST.get('user')
+        inventry_id = request.POST.get('device')
+        tracking_no = request.POST.get('tracking_no')
+        datetimes = request.POST.get('datetime')
+        other_information = request.POST.get('other_information')
+        macbookInventry = MacbookInventry(inventry_id=inventry_id, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=1, other_info=other_information,
+                            created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
+                            updated_by=request.user.username, datetime=datetimes)
+        macbookInventry.save()
+        # Optionally, you can return a success message
+        success_message = "MacBook assign successfully."
+        messages.success(request, success_message)
+        return redirect('dashboard')
+    deviceusers = DeviceUser.objects.all()
+    inventries = Inventry.objects.all()
+    return render(request, 'assign_macbook.html', {'deviceusers':deviceusers, 'inventries':inventries})
 def delete_deviceuser(request, user_id):
     user = get_object_or_404(DeviceUser, pk=user_id)
     user.delete()

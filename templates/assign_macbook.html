@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block body %}
+<script>
+    $(document).ready(function() {
+        var stateUser = $('#user');
+        stateUser.select2({
+            placeholder: 'Select User',
+            allowClear: true
+        });
+        var stateDevice = $('#device');
+        stateDevice.select2({
+            placeholder: 'Select Device',
+            allowClear: true
+        });
+    })
+
+</script>
+<div class="mt-5 mb-5" >
+    <form method="POST" action="/assign_macbook/">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-4">
+            <label class="form-label">User <span class="text-danger">*</span></label>
+            <select class="form-select" name="user" id="user" aria-label="type">
+              <option selected value="">Please select user</option>
+                {% for deviceuser in deviceusers %}
+                    <option value="{{deviceuser.id}}">{{deviceuser.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-4">
+            <label class="form-label">Device <span class="text-danger">*</span></label>
+            <select class="form-control choices-single" name="device" id="device" aria-label="type">
+              <option selected value="">Please select device</option>
+                {% for inventrie in inventries %}
+                    <option value="{{inventrie.id}}">{{inventrie.serial_no}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-4">
+            <label class="form-label">Tkacking No</label>
+            <input type="text" required class="form-control" name="tracking_no" {% if tracking_no != "" %} value="{{ tracking_no }}" {% endif %} id="tracking_no" aria-describedby="trackingHelp">
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-4">
+            <label class="form-label">DateTime</label>
+            <input type="datetime-local" required class="form-control" name="datetime" id="datetime" aria-describedby="dateTimeHelp">
+        </div>
+        <div class="col-4">
+            <label class="form-label">Tkacking Slip</label>
+            <input type="file" class="form-control" name="tracking_slpi" id="tracking_slpi" aria-describedby="trackingSlipHelp">
+        </div>
+        <div class="col-4">
+            <label class="form-label">Other information</label>
+            <textarea id="other_information" name="other_information" class="form-control" required></textarea>
+        </div>
+    </div>
+     <div class="row mt-3">
+        <div class="col-12 mt-3">
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+    </div>
+</form>
+</div>
+
+{% endblock body %}

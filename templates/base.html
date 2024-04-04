@@ -6,13 +6,87 @@
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
   <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
-</head>
-<body class="container">
-  <header>This is header {{request.user.username}}</header>
+  <!-- Select2 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
-  <!-- Your body goes here -->[
-  {% block body %}
-  {% endblock body %}
+  <!-- Select2 JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+  .navbar {
+    background-color: #007bff; /* Blue */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px;
+    width: 100%; /* Set width to 100% */
+  }
+
+  .navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .navbar-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .navbar-menu ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-menu ul li {
+    margin-right: 20px;
+  }
+
+  .navbar-menu ul li a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .navbar-menu ul li a:hover {
+    color: #f0f0f0;
+  }
+  .navbar-brand a {
+    color: #f0f0f0;
+    text-decoration: none;
+  }
+</style>
+
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="navbar-brand"><a href="{% url 'dashboard' %}">Inventry Management</a></div>
+      <div class="navbar-menu">
+        <ul>
+          <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+          <li><a href="{% url 'list_inventry' %}">Inventry</a></li>
+          <li><a href="{% url 'user_overview' %}">User</a></li>
+        </ul>
+      </div>
+      <div class="navbar-user">
+        <!-- Username with logout button -->
+        <!-- Replace 'username' with the actual username -->
+
+        <form method="POST" action="/logout/">
+          <span>{{request.user.username}}</span>
+          {% csrf_token %}
+          <button type="submit" >Logout</button>
+        </form>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Your body goes here -->
+  <div class="container">
+    {% block body %}
+    {% endblock body %}
+  </div>
 
   <footer>This is footer</footer>
 </body>

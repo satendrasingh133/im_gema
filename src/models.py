@@ -2,17 +2,19 @@ from django.db import models
 from django.core.validators import RegexValidator
 
 # Create your models here.
+# Status: 0 (not avaulable) , 1 (available), 2 (Returned) , 3 (Beakfix)
 class Inventry(models.Model):
     type = models.CharField(max_length=122)
     name = models.CharField(max_length=122)
     serial_no = models.CharField(max_length=122)
-    status = models.CharField(max_length=122)
+    status = models.IntegerField()
     device_status = models.CharField(max_length=122)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=122)
     updated_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.CharField(max_length=122)
 
+# status: 0(assigned ), 1(fresh user), 2 (Resigined), 3 (Breakfix)
 class DeviceUser(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)  # Ensure email uniqueness
@@ -22,4 +24,19 @@ class DeviceUser(models.Model):
     state = models.CharField(max_length=100)
     created_by = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
+
+class MacbookInventry(models.Model):
+    inventry_id = models.IntegerField()
+    deviceuser_id = models.IntegerField()
+    datetime = models.DateTimeField(auto_now=False)
+    photo = models.CharField(max_length=200)
+    tracking_no = models.CharField(max_length=20)
+    other_info = models.TextField()
+    status = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=122)
+    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.CharField(max_length=122)
+

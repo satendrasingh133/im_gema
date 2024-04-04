@@ -4,6 +4,7 @@ from src import views
 
 urlpatterns = [
     path('inventry/', views.list_inventry, name="list_inventry"),
+    path('dashboard/', views.dashboard, name="dashboard"),
     path('addinventry/', views.add_inventry, name="add_inventry"),
     path('update_inventry/<int:inventry_id>/', views.get_inventry_by_id, name="update_inventry"),
     path('delete_inventry/<int:inventry_id>/', views.delete_inventry, name="delete_inventry"),
@@ -11,5 +12,7 @@ urlpatterns = [
     path('adddeviceuser/', views.create_deviceuser, name="add_deviceuser"),
     path('useroverview/', views.user_overview, name="user_overview"),
     path('edit/<int:user_id>/', views.edit_user, name='edit_user'),
-    path('delete_user/<int:user_id>/', views.delete_deviceuser, name='delete_user')
+    path('delete_user/<int:user_id>/', views.delete_deviceuser, name='delete_user'),
+    path('assign_macbook/', views.assign_macbook, name='assign_macbook'),
+    path('logout/', views.logout_view, name='logout'),
 ]
