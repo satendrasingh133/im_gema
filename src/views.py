@@ -6,6 +6,11 @@ from django.contrib import messages
 from django.contrib.auth import logout
 
 # Create your views here.
+def dashboard(request):
+    if request.user.is_anonymous:
+        return redirect("/admin") 
+    return render(request, 'dashboard.html')
+
 def list_inventry(request):
     if request.user.is_anonymous:
         return redirect("/admin")

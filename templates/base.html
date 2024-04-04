@@ -6,15 +6,89 @@
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
   <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+  <!-- Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+  .navbar {
+    background-color: #007bff; /* Blue */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px;
+    width: 100%; /* Set width to 100% */
+  }
+
+  .navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .navbar-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .navbar-menu ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-menu ul li {
+    margin-right: 20px;
+  }
+
+  .navbar-menu ul li a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .navbar-menu ul li a:hover {
+    color: #f0f0f0;
+  }
+  .badge { 
+    font-size: 20px;   
+    color: #06656f;
+  }
+
+  /* Footer styling */
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    text-align: center;
+  }
+</style>
 </head>
-<body class="container">
-  <header>This is header {{request.user.username}}</header>
-
-  <!-- Your body goes here -->[
-  {% block body %}
-  {% endblock body %}
-
-  <footer>This is footer</footer>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="navbar-brand">Inventory Management</div>
+      <div class="navbar-menu">
+        <ul>
+          <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+          <li><a href="{% url 'list_inventry' %}">Inventory</a></li>
+          <li><a href="{% url 'user_overview' %}">User</a></li>
+        </ul>
+      </div>
+      <div class="navbar-user">      
+        <span>{{request.user.username}}</span>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+  <div class="container">  
+    {% block body %}
+    {% endblock body %}
+  </div>
+  <footer>&copy; 2024 GemaIndia. All rights reserved.</footer>
 </body>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 </html>

@@ -4,6 +4,7 @@ from src import views
 
 urlpatterns = [
     path('inventry/', views.list_inventry, name="list_inventry"),
+    path('dashboard/', views.dashboard, name="dashboard"),
     path('addinventry/', views.add_inventry, name="add_inventry"),
     path('update_inventry/<int:inventry_id>/', views.get_inventry_by_id, name="update_inventry"),
     path('delete_inventry/<int:inventry_id>/', views.delete_inventry, name="delete_inventry"),
