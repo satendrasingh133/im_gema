@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'gema.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gema',
+        'NAME': 'gemaindia',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
