@@ -3,19 +3,44 @@
 <script>
     $(document).ready(function() {
         var stateUser = $('#user');
-        stateUser.select2({
-            placeholder: 'Select User',
-            allowClear: true
-        });
+        var selectedUser = '{{ macbookInventryData.user }}';
+        if(selectedUser){
+            stateUser.val(selectedUser).trigger('change');
+            stateUser.select2({
+                placeholder: 'Select User',
+                allowClear: true
+            });
+        }else{
+            stateUser.select2({
+                placeholder: 'Select User',
+                allowClear: true
+            });
+        }
         var stateDevice = $('#device');
-        stateDevice.select2({
-            placeholder: 'Select Device',
-            allowClear: true
-        });
+        var selectedDevice = '{{ macbookInventryData.user }}';
+        if(selectedDevice){
+            stateDevice.val(selectedDevice).trigger('change');
+            stateDevice.select2({
+                placeholder: 'Select Device',
+                allowClear: true
+            });
+        }else{
+            stateDevice.select2({
+                placeholder: 'Select Device',
+                allowClear: true
+            });
+        }
+
     })
 
 </script>
 <div class="mt-5 mb-5" >
+    {% if error_message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{error_message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
     <form method="POST" action="/assign_macbook/">
     {% csrf_token %}
     <div class="row">
@@ -24,7 +49,7 @@
             <select class="form-select" name="user" id="user" aria-label="type">
               <option selected value="">Please select user</option>
                 {% for deviceuser in deviceusers %}
-                    <option value="{{deviceuser.id}}">{{deviceuser.name}}</option>
+                    <option  value="{{deviceuser.id}}">{{deviceuser.name}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -33,19 +58,19 @@
             <select class="form-control choices-single" name="device" id="device" aria-label="type">
               <option selected value="">Please select device</option>
                 {% for inventrie in inventries %}
-                    <option value="{{inventrie.id}}">{{inventrie.serial_no}}</option>
+                    <option {% if macbookInventryData.device == inventrie.id %} selected {% endif %} value="{{inventrie.id}}">{{inventrie.serial_no}}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-4">
             <label class="form-label">Tkacking No</label>
-            <input type="text" required class="form-control" name="tracking_no" {% if tracking_no != "" %} value="{{ tracking_no }}" {% endif %} id="tracking_no" aria-describedby="trackingHelp">
+            <input type="text" class="form-control" name="tracking_no" {% if macbookInventryData.tracking_no != "" %} value="{{ macbookInventryData.tracking_no }}" {% endif %} id="tracking_no" aria-describedby="trackingHelp">
         </div>
     </div>
     <div class="row mt-3">
         <div class="col-4">
             <label class="form-label">DateTime</label>
-            <input type="datetime-local" required class="form-control" name="datetime" id="datetime" aria-describedby="dateTimeHelp">
+            <input type="datetime-local" class="form-control" name="datetime" id="datetime" aria-describedby="dateTimeHelp">
         </div>
         <div class="col-4">
             <label class="form-label">Tkacking Slip</label>
@@ -53,7 +78,7 @@
         </div>
         <div class="col-4">
             <label class="form-label">Other information</label>
-            <textarea id="other_information" name="other_information" class="form-control" required></textarea>
+            <textarea id="other_information" name="other_information" class="form-control" required>{% if macbookInventryData.other_information != "" %} {{ macbookInventryData.other_information }} {% endif %}</textarea>
         </div>
     </div>
      <div class="row mt-3">

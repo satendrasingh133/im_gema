@@ -58,10 +58,14 @@
             <td>{{ user.state }}</td>
             <td>{{ user.pincode }}</td>
             <td>
-                {% if user.status == 1 %}
-                    Available
-                {% else %}
-                    Not Available
+                {% if user.status == 0 %}
+                    Assigned
+                {% elif user.status == 1 %}
+                    Fresh user
+                {% elif user.status == 2 %}
+                    Resigined
+                {% elif user.status == 3 %}
+                    Breakfix
                 {% endif %}
             <td>
 

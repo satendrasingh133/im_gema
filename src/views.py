@@ -257,22 +257,54 @@ def edit_user(request, user_id):
 def assign_macbook(request):
     if request.user.is_anonymous:
         return redirect("/admin")
+    deviceusers = DeviceUser.objects.all()
+    inventries = Inventry.objects.all()
     if request.method == "POST":
         deviceuser_id = request.POST.get('user')
         inventry_id = request.POST.get('device')
         tracking_no = request.POST.get('tracking_no')
         datetimes = request.POST.get('datetime')
         other_information = request.POST.get('other_information')
+        macbookInventryData = {
+            'user': deviceuser_id,
+            'device': inventry_id,
+            'tracking_no': tracking_no,
+            'datetime': datetimes,
+            'other_information': other_information,
+        }
+        # Check if required fields are empty
+        if not deviceuser_id:
+            error_message = "User cannot be empty."
+            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+        if not inventry_id:
+            error_message = "Device cannot be empty."
+            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+        # if not tracking_no:
+        #     error_message = "Tracking No cannot be empty."
+        #     return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+        # if not datetimes:
+        #     error_message = "Datetime cannot be empty."
+        #     return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+
         macbookInventry = MacbookInventry(inventry_id=inventry_id, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=1, other_info=other_information,
                             created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
                             updated_by=request.user.username, datetime=datetimes)
         macbookInventry.save()
+        # change status in inventry table
+        inventry = get_object_or_404(Inventry, pk=inventry_id)
+        inventry.status = 0
+        inventry.save()
+
+        # change status in deviceuser table
+        deviceuser = get_object_or_404(DeviceUser, pk=deviceuser_id)
+        deviceuser.status = 0
+        deviceuser.save()
+
         # Optionally, you can return a success message
         success_message = "MacBook assign successfully."
         messages.success(request, success_message)
         return redirect('dashboard')
-    deviceusers = DeviceUser.objects.all()
-    inventries = Inventry.objects.all()
+
     return render(request, 'assign_macbook.html', {'deviceusers':deviceusers, 'inventries':inventries})
 def delete_deviceuser(request, user_id):
     user = get_object_or_404(DeviceUser, pk=user_id)

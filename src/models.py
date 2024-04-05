@@ -27,9 +27,11 @@ class DeviceUser(models.Model):
     status = models.IntegerField()
     updated_at = models.DateTimeField(auto_now=True)
 
+# macbook_id=inventry_id and usb_id is also inventry id
 class MacbookInventry(models.Model):
-    inventry_id = models.IntegerField()
     deviceuser_id = models.IntegerField()
+    macbook_id = models.IntegerField()
+    usb_id = models.IntegerField()
     datetime = models.DateTimeField(auto_now=False)
     photo = models.CharField(max_length=200)
     tracking_no = models.CharField(max_length=20)

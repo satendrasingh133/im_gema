@@ -49,10 +49,14 @@
                 <td>{{ inventry.name }}</td>
                 <td>{{ inventry.serial_no }}</td>
                 <td>
-                    {% if inventry.status == 1 %}
+                    {% if inventry.status == 0 %}
+                        Not available
+                    {% elif inventry.status == 1 %}
                         Available
-                    {% else %}
-                        Not Available
+                    {% elif inventry.status == 2 %}
+                        Returned
+                    {% elif inventry.status == 3 %}
+                        Breakfix
                     {% endif %}
                 </td>
                 <td>
