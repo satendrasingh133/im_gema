@@ -4,15 +4,14 @@ from src.models import Inventry, DeviceUser, MacbookInventry
 import re
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-
 
 # Create your views here.
 def dashboard(request):
     if request.user.is_anonymous:
         return redirect("/admin")
-    return render(request, 'dashboard.html')
+    macbookInventry = MacbookInventry.objects.all()
+    return render(request, 'dashboard.html', {'macbookInventrys': macbookInventry})
+
 def logout_view(request):
     logout(request)
     # Redirect to a page after logout
@@ -257,17 +256,20 @@ def edit_user(request, user_id):
 def assign_macbook(request):
     if request.user.is_anonymous:
         return redirect("/admin")
-    deviceusers = DeviceUser.objects.all()
-    inventries = Inventry.objects.all()
+    deviceusers = DeviceUser.objects.filter(status=1)
+    laptops = Inventry.objects.filter(type='laptop', status=1)
+    adapters = Inventry.objects.filter(type='adapter', status=1)
     if request.method == "POST":
         deviceuser_id = request.POST.get('user')
         inventry_id = request.POST.get('device')
+        adapter = request.POST.get('adapter')
         tracking_no = request.POST.get('tracking_no')
         datetimes = request.POST.get('datetime')
         other_information = request.POST.get('other_information')
         macbookInventryData = {
             'user': deviceuser_id,
             'device': inventry_id,
+            'adapter': adapter,
             'tracking_no': tracking_no,
             'datetime': datetimes,
             'other_information': other_information,
@@ -275,25 +277,29 @@ def assign_macbook(request):
         # Check if required fields are empty
         if not deviceuser_id:
             error_message = "User cannot be empty."
-            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
         if not inventry_id:
             error_message = "Device cannot be empty."
-            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
         # if not tracking_no:
         #     error_message = "Tracking No cannot be empty."
         #     return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
-        # if not datetimes:
-        #     error_message = "Datetime cannot be empty."
-        #     return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'inventries':inventries})
+        if not datetimes:
+            error_message = "Datetime cannot be empty."
+            return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
-        macbookInventry = MacbookInventry(inventry_id=inventry_id, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=1, other_info=other_information,
+        macbookInventry = MacbookInventry(macbook_id=inventry_id, usb_id=adapter, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=1, other_info=other_information,
                             created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
                             updated_by=request.user.username, datetime=datetimes)
         macbookInventry.save()
         # change status in inventry table
-        inventry = get_object_or_404(Inventry, pk=inventry_id)
-        inventry.status = 0
-        inventry.save()
+        macbookInventry = get_object_or_404(Inventry, pk=inventry_id)
+        macbookInventry.status = 0
+        macbookInventry.save()
+
+        adapterInventry = get_object_or_404(Inventry, pk=adapter)
+        adapterInventry.status = 0
+        adapterInventry.save()
 
         # change status in deviceuser table
         deviceuser = get_object_or_404(DeviceUser, pk=deviceuser_id)
@@ -305,7 +311,7 @@ def assign_macbook(request):
         messages.success(request, success_message)
         return redirect('dashboard')
 
-    return render(request, 'assign_macbook.html', {'deviceusers':deviceusers, 'inventries':inventries})
+    return render(request, 'assign_macbook.html', {'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 def delete_deviceuser(request, user_id):
     user = get_object_or_404(DeviceUser, pk=user_id)
     user.delete()

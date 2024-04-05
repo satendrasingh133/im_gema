@@ -32,7 +32,7 @@ class MacbookInventry(models.Model):
     deviceuser_id = models.IntegerField()
     macbook_id = models.IntegerField()
     usb_id = models.IntegerField()
-    datetime = models.DateTimeField(auto_now=False)
+    datetime = models.DateTimeField()
     photo = models.CharField(max_length=200)
     tracking_no = models.CharField(max_length=20)
     other_info = models.TextField()

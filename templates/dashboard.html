@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block body %}
-
+{% load custom_tags %}
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-3">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total Laptops</h5>
-          <span class="badge badge-primary badge-pill">10</span>
+          <span class="badge badge-primary badge-pill">{{ "laptop" | get_totalLaptop }}</span>
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total Adapters</h5>
-          <span class="badge badge-primary badge-pill">20</span>
+          <span class="badge badge-primary badge-pill">{{ "adapter" | get_totalLaptop }}</span>
         </div>
       </div>
     </div>
@@ -53,50 +53,49 @@
             </div>
         {% endfor %}inventries
     {% endif %}
+      {% if macbookInventrys %}
       <!-- Table to display laptop users -->
       <table id="inventoryTable" class="table table-striped table-bordered" style="width:100%">
         <thead>
           <tr>
             <th>S. No</th>
             <th>Username</th>
-            <th>Device Type</th>
-            <th>Serial No</th>
+            <th>Device</th>
+            <th>Adapter</th>
             <th>Date</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
+        {% for macbookInventry in macbookInventrys %}
           <tr>
             <td>1</td>
-            <td>User A</td>
-            <td>Laptop 1</td>
-            <td>SN1234</td>
-            <td>2024-03-20</td>
+            <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
+            <td>
+              {{macbookInventry.macbook_id | get_devicename_from_id}}
+              <br>
+              {{ macbookInventry.macbook_id | get_deviceserial_no_from_id}}
+            </td>
+           <td>
+              {{macbookInventry.usb_id | get_devicename_from_id}}
+              <br>
+              {{ macbookInventry.usb_id | get_deviceserial_no_from_id}}
+            </td>
+            <td>{{macbookInventry.datetime}}</td>
             <td>
                 <button type="button" class="btn btn-primary">Breakfix</button>
                 <button type="button" class="btn btn-primary">Returned</button>
               </td>
           </tr>
-          <tr>
-            <td>2</td>
-            <td>User B</td>
-            <td>Laptop 2</td>
-            <td>SN5678</td>
-            <td>2024-03-21</td>
-            <td>
-              <button type="button" class="btn btn-primary">Breakfix</button>
-              <button type="button" class="btn btn-primary">Returned</button>
-            </td>
-          </tr>
+        {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <p>No data available</p>
+      {% endif %}
     </div>
   </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-
 <script>
   $(document).ready(function() {
     // Initialize DataTable

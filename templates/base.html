@@ -55,6 +55,19 @@
     color: #f0f0f0;
     text-decoration: none;
   }
+   .badge {
+    font-size: 20px;
+    color: #06656f;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    text-align: center;
+  }
 </style>
 
 </head>
@@ -87,8 +100,11 @@
     {% block body %}
     {% endblock body %}
   </div>
-
-  <footer>This is footer</footer>
+  <footer>&copy; 2024 GemaIndia. All rights reserved.</footer>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+
 </html>
