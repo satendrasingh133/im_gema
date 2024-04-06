@@ -3,28 +3,46 @@ from datetime import datetime
 from src.models import Inventry, DeviceUser, MacbookInventry
 import re
 from django.contrib import messages
-from django.contrib.auth import logout
+from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.models import User
 
 # Create your views here.
+def index(request):
+    if request.user.is_anonymous:
+        if request.method == "POST":
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                success_message = "Incorrect username and password."
+                messages.success(request, success_message)
+                return render(request, 'index.html')
+    else:
+        return redirect("dashboard")
+    return render(request, 'index.html')
+
 def dashboard(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     macbookInventry = MacbookInventry.objects.all()
     return render(request, 'dashboard.html', {'macbookInventrys': macbookInventry})
 
 def logout_view(request):
     logout(request)
     # Redirect to a page after logout
-    return redirect("/admin")
+    return redirect("/")
 def list_inventry(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     inventries = Inventry.objects.all()
     return render(request, 'inventry.html', {'inventries': inventries})
 
 def get_inventry_by_id(request, inventry_id):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     # Retrieve the inventory item by ID or return a 404 error if not found
     inventry = get_object_or_404(Inventry, pk=inventry_id)
 
@@ -32,7 +50,7 @@ def get_inventry_by_id(request, inventry_id):
     return render(request, 'update_inventry.html', {'inventry': inventry})
 def add_inventry(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     if request.method == "POST":
         # Get the values from POST data
         type = request.POST.get('type')
@@ -63,7 +81,7 @@ def add_inventry(request):
 
 def update_inventry_data(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     if request.method == 'POST':
         inventry_id = request.POST.get('inventry_id')
         # Retrieve the inventory item by ID or return a 404 error if not found
@@ -94,7 +112,7 @@ def delete_inventry(request, inventry_id):
 
 def create_deviceuser(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -176,14 +194,14 @@ def create_deviceuser(request):
 
 def user_overview(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     deviceuser = DeviceUser.objects.all()
     return render(request, 'user_overview.html', {'deviceuser': deviceuser})
 
 
 def edit_user(request, user_id):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     user = DeviceUser.objects.get(pk=user_id)
 
     if request.method == 'POST':
@@ -255,7 +273,7 @@ def edit_user(request, user_id):
 
 def assign_macbook(request):
     if request.user.is_anonymous:
-        return redirect("/admin")
+        return redirect("/")
     deviceusers = DeviceUser.objects.filter(status=1)
     laptops = Inventry.objects.filter(type='laptop', status=1)
     adapters = Inventry.objects.filter(type='adapter', status=1)

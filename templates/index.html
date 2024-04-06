@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+  <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+<style>
+  .navbar {
+    background-color: #007bff; /* Blue */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px;
+    width: 100%; /* Set width to 100% */
+  }
+
+  .navbar-brand {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .navbar-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .navbar-menu ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-menu ul li {
+    margin-right: 20px;
+  }
+
+  .navbar-menu ul li a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .navbar-menu ul li a:hover {
+    color: #f0f0f0;
+  }
+  .navbar-brand a {
+    color: #f0f0f0;
+    text-decoration: none;
+  }
+   .badge {
+    font-size: 20px;
+    color: #06656f;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    text-align: center;
+  }
+</style>
+
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="navbar-brand">Inventry Management</div>
+      <div class="navbar-user">
+        <!-- Username with logout button -->
+        <!-- Replace 'username' with the actual username -->
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- Your body goes here -->
+  <div class="container">
+    <form method="POST" action="/">
+        {% csrf_token %}
+        <div class="row mt-5">
+            <div class="col-4"></div>
+            <div class="col-4 mt-3">
+                <h2>Login form</h2>
+                 {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" id="alertContainer" role="alert">
+                          {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="mb-3">
+                    <label for="exampleInputusername" class="form-label">Username <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" required name="username" id="exampleInputusername" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password <span class="text-danger">*</span></label>
+                    <input type="password" required name="password" class="form-control" id="exampleInputPassword1">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </form>
+  </div>
+  <footer>&copy; 2024 GemaIndia. All rights reserved.</footer>
+</body>
+<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+
+</html>
