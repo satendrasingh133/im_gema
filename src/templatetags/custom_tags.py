@@ -19,7 +19,12 @@ def get_deviceserial_no_from_id(user_id):
     return inventry.serial_no
 
 @register.filter
-def get_totalLaptop(type):
+def get_total(type):
     laptops = Inventry.objects.filter(type=type)
-    return laptops.count()
+    return laptops.count() if laptops.count() else 0
+
+@register.filter
+def get_available(type):
+    data = Inventry.objects.filter(type=type, status=1)
+    return data.count() if data.count() else 0
 
