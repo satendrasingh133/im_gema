@@ -5,7 +5,8 @@ import re
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
-
+from django.core.files.storage import FileSystemStorage
+from django.utils import timezone
 # Create your views here.
 def index(request):
     if request.user.is_anonymous:
@@ -89,11 +90,13 @@ def update_inventry_data(request):
         type = request.POST.get('type')
         name = request.POST.get('name')
         serial_number = request.POST.get('serial_number')
+        status = request.POST.get('status')
 
         # Update the inventory item with the submitted data
         inventry.type = type
         inventry.name = name
         inventry.serial_no = serial_number
+        inventry.status = status
         inventry.updated_at = datetime.today()
         inventry.updated_by = request.user.username
         inventry.save()
@@ -278,6 +281,16 @@ def assign_macbook(request):
     laptops = Inventry.objects.filter(type='laptop', status=1)
     adapters = Inventry.objects.filter(type='adapter', status=1)
     if request.method == "POST":
+        tracking_slip = request.FILES.get('tracking_slpi')
+        tracking_slip_path=""
+        if tracking_slip:
+            current_datetime_seconds = str(int(timezone.now().timestamp()))
+            file_extension = tracking_slip.name.split('.')[-1]
+            new_filename = f"{current_datetime_seconds}.{file_extension}"
+            fs = FileSystemStorage()
+            filename = fs.save(new_filename, tracking_slip)
+            tracking_slip_path = fs.url(filename)
+
         deviceuser_id = request.POST.get('user')
         inventry_id = request.POST.get('device')
         adapter = request.POST.get('adapter')
@@ -308,7 +321,7 @@ def assign_macbook(request):
 
         macbookInventry = MacbookInventry(macbook_id=inventry_id, usb_id=adapter, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=1, other_info=other_information,
                             created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
-                            updated_by=request.user.username, datetime=datetimes)
+                            updated_by=request.user.username, datetime=datetimes, photo=tracking_slip_path)
         macbookInventry.save()
         # change status in inventry table
         macbookInventry = get_object_or_404(Inventry, pk=inventry_id)
@@ -334,3 +347,11 @@ def delete_deviceuser(request, user_id):
     user = get_object_or_404(DeviceUser, pk=user_id)
     user.delete()
     return redirect('user_overview')
+
+def asign_and_breakfis(request, id):
+    deviceusers = DeviceUser.objects.all()
+    laptops = Inventry.objects.filter(type='laptop')
+    adapters = Inventry.objects.filter(type='adapter')
+    macbookInventryData = get_object_or_404(MacbookInventry, pk=id)
+    return render(request, 'asign_and_breakfis.html', {'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
+

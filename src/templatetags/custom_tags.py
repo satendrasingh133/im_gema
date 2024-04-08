@@ -25,6 +25,6 @@ def get_total(type):
 
 @register.filter
 def get_available(type):
-    data = Inventry.objects.filter(type=type, status=1)
-    return data.count() if data.count() else 0
+    data = Inventry.objects.filter(type=type, status__in=[1, 2])
+    return data.count() if data.exists() else 0
 

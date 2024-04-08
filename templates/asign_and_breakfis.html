@@ -3,7 +3,10 @@
 <script>
     $(document).ready(function() {
         var stateUser = $('#user');
-        var selectedUser = '{{ macbookInventryData.user }}';
+        var selectedUser = '{{ macbookInventryData.deviceuser_id }}';
+        var selectedDevice = '{{ macbookInventryData.macbook_id }}';
+        var selectedAdapter = '{{ macbookInventryData.usb_id }}';
+
         if(selectedUser){
             stateUser.val(selectedUser).trigger('change');
             stateUser.select2({
@@ -18,7 +21,6 @@
         }
 
         var stateDevice = $('#device');
-        var selectedDevice = '{{ macbookInventryData.device }}';
         if(selectedDevice){
             stateDevice.val(selectedDevice).trigger('change');
             stateDevice.select2({
@@ -32,7 +34,6 @@
             });
         }
         var selectAdapter = $('#adapter');
-        var selectedAdapter = '{{ macbookInventryData.adapter }}';
         if(selectAdapter){
             selectAdapter.val(selectedAdapter).trigger('change');
             selectAdapter.select2({
@@ -45,7 +46,9 @@
                 allowClear: true
             });
         }
+
     })
+
 </script>
 <div class="mt-5 mb-5" >
     {% if error_message %}
@@ -54,7 +57,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endif %}
-    <form method="POST" action="/assign_macbook/"  enctype="multipart/form-data">
+    <form method="POST" action="/assign_macbook/">
     {% csrf_token %}
     <div class="row">
         <div class="col-4">
@@ -85,14 +88,19 @@
             </select>
         </div>
     </div>
+
     <div class="row mt-3">
         <div class="col-4">
             <label class="form-label">Tkacking No</label>
             <input type="text" class="form-control" name="tracking_no" {% if macbookInventryData.tracking_no != "" %} value="{{ macbookInventryData.tracking_no }}" {% endif %} id="tracking_no" aria-describedby="trackingHelp">
         </div>
         <div class="col-4">
-            <label class="form-label">DateTime</label>
-            <input type="datetime-local" class="form-control" name="datetime" id="datetime" aria-describedby="dateTimeHelp">
+            <label class="form-label">DateTime</label>{{ macbookInventryData.datetime|date:'d-m-Y h:m' }}
+            <input type="datetime-local" class="form-control" name="datetime" id="datetime"
+                    {% if macbookInventryData.datetime %}
+                   value="{{ macbookInventryData.datetime|date:'d-m-Y h:m' }}"
+               {% endif %}
+                   aria-describedby="dateTimeHelp">
         </div>
         <div class="col-4">
             <label class="form-label">Tkacking Slip</label>
@@ -102,7 +110,7 @@
      <div class="row mt-3">
          <div class="col-8">
             <label class="form-label">Other information</label>
-            <textarea id="other_information" name="other_information" class="form-control" required>{% if macbookInventryData.other_information != "" %} {{ macbookInventryData.other_information }} {% endif %}</textarea>
+            <textarea id="other_information" name="other_information" class="form-control" required>{{ macbookInventryData.other_info }}</textarea>
         </div>
     </div>
      <div class="row mt-3">

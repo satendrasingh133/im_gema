@@ -23,7 +23,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Available Laptops</h5>
-          <span class="badge badge-primary badge-pill">{{ "laptop" | get_total }}</span>
+          <span class="badge badge-primary badge-pill">{{ "laptop" | get_available }}</span>
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Available Adapters</h5>
-          <span class="badge badge-primary badge-pill">{{ "adapter" | get_total }}</span>
+          <span class="badge badge-primary badge-pill">{{ "adapter" | get_available }}</span>
         </div>
       </div>
     </div>
@@ -63,6 +63,7 @@
             <th>Device</th>
             <th>Adapter</th>
             <th>Date</th>
+            <th>File</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -82,10 +83,16 @@
               {{ macbookInventry.usb_id | get_deviceserial_no_from_id}}
             </td>
             <td>{{macbookInventry.datetime}}</td>
+           <td>
+              {% if macbookInventry.photo %}
+                  <a href="{{ MEDIA_URL }}{{ macbookInventry.photo }}" target="_blank">file</a>
+              {% endif %}
+          </td>
             <td>
-                <button type="button" class="btn btn-primary">Breakfix</button>
-                <button type="button" class="btn btn-primary">Returned</button>
-              </td>
+              <a href="{% url 'asign_and_breakfis' macbookInventry.id %}" class="btn btn-primary btn-sm">
+                    Breakfix
+                </a>
+            </td>
           </tr>
         {% endfor %}
         </tbody>
