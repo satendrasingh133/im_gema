@@ -12,6 +12,7 @@
         }
     }
     $(document).ready(function(){
+        $('#inventoryTable').DataTable();
         setTimeout(function() {
             var alertContainer = document.getElementById('alertContainer');
             alertContainer.parentNode.removeChild(alertContainer);
@@ -29,9 +30,10 @@
               {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        {% endfor %}
+        {% endfor %}inventries
     {% endif %}
-    <table class="table table-striped">
+    {% if inventries %}
+    <table id="inventoryTable" class="table table-striped">
         <thead>
             <tr>
                 <th>Type</th>
@@ -44,14 +46,18 @@
         <tbody>
             {% for inventry in inventries %}
             <tr>
-                <td>{{ inventry.type }}</td>
+                <td>{{ inventry.type|capfirst }}</td>
                 <td>{{ inventry.name }}</td>
                 <td>{{ inventry.serial_no }}</td>
                 <td>
-                    {% if inventry.status == 1 %}
+                    {% if inventry.status == 0 %}
+                        Not available
+                    {% elif inventry.status == 1 %}
                         Available
-                    {% else %}
-                        Not Available
+                    {% elif inventry.status == 2 %}
+                        Returned
+                    {% elif inventry.status == 3 %}
+                        Breakfix
                     {% endif %}
                 </td>
                 <td>
@@ -72,6 +78,9 @@
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p>No data please add inventry</p>
+    {% endif %}
 </div>
 
 {% endblock body %}

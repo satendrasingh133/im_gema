@@ -6,11 +6,6 @@
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
   <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
-  <!-- Select2 CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-
-  <!-- Select2 JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <style>
   .navbar {
     background-color: #007bff; /* Blue */
@@ -74,37 +69,47 @@
 <body>
   <header>
     <nav class="navbar">
-      <div class="navbar-brand"><a href="{% url 'dashboard' %}">Inventry Management</a></div>
-      <div class="navbar-menu">
-        <ul>
-          <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-          <li><a href="{% url 'list_inventry' %}">Inventry</a></li>
-          <li><a href="{% url 'user_overview' %}">User</a></li>
-        </ul>
-      </div>
+      <div class="navbar-brand">Inventry Management</div>
       <div class="navbar-user">
         <!-- Username with logout button -->
         <!-- Replace 'username' with the actual username -->
 
-        <form method="POST" action="/logout/">
-          <span>{{request.user.username}}</span>
-          {% csrf_token %}
-          <button type="submit" >Logout</button>
-        </form>
       </div>
     </nav>
   </header>
 
   <!-- Your body goes here -->
   <div class="container">
-    {% block body %}
-    {% endblock body %}
+    <form method="POST" action="/">
+        {% csrf_token %}
+        <div class="row mt-5">
+            <div class="col-4"></div>
+            <div class="col-4 mt-3">
+                <h2>Login form</h2>
+                 {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" id="alertContainer" role="alert">
+                          {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="mb-3">
+                    <label for="exampleInputusername" class="form-label">Username <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" required name="username" id="exampleInputusername" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Password <span class="text-danger">*</span></label>
+                    <input type="password" required name="password" class="form-control" id="exampleInputPassword1">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </form>
   </div>
   <footer>&copy; 2024 GemaIndia. All rights reserved.</footer>
 </body>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 
 </html>

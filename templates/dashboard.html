@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block body %}
 
+{% load custom_tags %}
+
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-3">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total Laptops</h5>
-          <span class="badge badge-primary badge-pill">10</span>
+          <span class="badge badge-primary badge-pill">{{ "laptop" | get_total }}</span>
         </div>
       </div>
     </div>
@@ -15,7 +17,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total Adapters</h5>
-          <span class="badge badge-primary badge-pill">20</span>
+          <span class="badge badge-primary badge-pill">{{ "adapter" | get_total }}</span>
         </div>
       </div>
     </div>
@@ -23,7 +25,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Available Laptops</h5>
-          <span class="badge badge-primary badge-pill">10</span>
+          <span class="badge badge-primary badge-pill">{{ "laptop" | get_available }}</span>
         </div>
       </div>
     </div>
@@ -31,65 +33,261 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Available Adapters</h5>
-          <span class="badge badge-primary badge-pill">20</span>
+          <span class="badge badge-primary badge-pill">{{ "adapter" | get_available }}</span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal for inventory details -->
+<div class="modal fade" id="inventoryModal" tabindex="-1" aria-labelledby="inventoryModalLabel" aria-hidden="true">
+
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inventoryModalLabel">Inventory Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+
+
+
+      <div class="modal-body">
+        <!-- Display user name, device name, adapter name, and status dropdown here -->
+
+     
+        <form method="POST" action="/update_device_status/"  enctype="multipart/form-data">
+          {% csrf_token %}
+          <p><b>User:</b> <span id="userName"></span></p>
+          <p><b>Device:</b> <span id="deviceName"></span> (<span id="deviceId"></span>)</p>
+          <p><b>Adapter:</b> <span id="adapterName"></span> (<span id="adapterId"></span>)</p>
+          <label for="status">Status:</label>
+          <select class="form-select" name="status" id="status" aria-label="status">   
+          </select>       
+
+
+          <div id="availableDevices" style="display: none;" class="mt-3">
+            <div id="availableSelect" style="display: block;" class="mt-3">
+              <label for="availableDevice">Available Devices:</label>
+              {% load custom_tags %}
+              <select class="form-select" name="laptop_serial_numbers" id="laptop_serial_numbers">
+                {% for device in 'laptop'|get_available_laptop_serial_numbers %}
+                    <option value="{{ device.id }}">{{ device.serial_no }}</option>
+                {% endfor %}
+              </select> 
+            </div>
+
+
+          <div class="row mt-3">
+            <div class="col-12">
+                <label class="form-label">Tkacking No</label>
+                <input type="text" class="form-control" name="tracking_no" value=""  id="tracking_no" aria-describedby="trackingHelp">
+            </div>
+            <div class="col-12 mt-3">
+                <label class="form-label">Shipment dateTime <span class="text-danger">*</span></label>
+                <input type="datetime-local" class="form-control" name="shipment_datetime" id="shipment_datetime" aria-describedby="dateTimeHelp">
+            </div>
+            <div class="col-12 mt-3">
+                <label class="form-label">Tkacking Slip</label>
+                <input type="file" class="form-control" name="tracking_slpi" id="tracking_slpi" aria-describedby="trackingSlipHelp">
+            </div>
+          </div>
+          <div class="row mt-12 mt-3">     
+            <div class="col-12">     
+              <label class="form-label">Other information</label>
+              <textarea id="other_information" name="other_information" class="form-control" required></textarea>
+            </div>
+              
+          </div>
+        </form>
+      </div>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="saveChangesBtn">Save</button>
+        <!-- Add submit button if needed -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="container mt-5">
   <div class="card">
     <div class="card-body">
-      <h5 class="card-title">Inventory Overview</h5>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="card-title">Inventory Overview</h5>
+        <a href="/assign_macbook/" class="btn btn-primary">Assign MacBook</a>
+    </div>
+      {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" id="alertContainer" role="alert">
+              {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+      {% if macbookInventrys %}
       <!-- Table to display laptop users -->
       <table id="inventoryTable" class="table table-striped table-bordered" style="width:100%">
         <thead>
           <tr>
             <th>S. No</th>
             <th>Username</th>
-            <th>Device Type</th>
-            <th>Serial No</th>
+            <th>Device</th>
+            <th>Adapter</th>
             <th>Date</th>
+            <th>File</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
+        {% for macbookInventry in macbookInventrys %}
           <tr>
             <td>1</td>
-            <td>User A</td>
-            <td>Laptop 1</td>
-            <td>SN1234</td>
-            <td>2024-03-20</td>
+            <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
             <td>
-                <button type="button" class="btn btn-primary">Breakfix</button>
-                <button type="button" class="btn btn-primary">Returned</button>
-              </td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>User B</td>
-            <td>Laptop 2</td>
-            <td>SN5678</td>
-            <td>2024-03-21</td>
+              {{macbookInventry.macbook_id | get_devicename_from_id}}
+              <br>
+              {{ macbookInventry.macbook_id | get_deviceserial_no_from_id}}
+            </td>
+           <td>
+              {{macbookInventry.usb_id | get_devicename_from_id}}
+              <br>
+              {{ macbookInventry.usb_id | get_deviceserial_no_from_id}}
+            </td>
+            <td>{{macbookInventry.datetime}}</td>
             <td>
-              <button type="button" class="btn btn-primary">Breakfix</button>
-              <button type="button" class="btn btn-primary">Returned</button>
+              {% if macbookInventry.photo %}
+                  <a href="{{ MEDIA_URL }}{{ macbookInventry.photo }}" target="_blank">file</a>
+              {% endif %}
+          </td>
+            <td>
+              <button type="button" class="btn btn-primary" onclick="openInventoryModal(
+              '{{ macbookInventry.deviceuser_id|get_username_from_id }}',  
+              '{{ macbookInventry.macbook_id | get_devicename_from_id }}',              
+              '{{  macbookInventry.macbook_id | get_deviceserial_no_from_id }}', 
+              '{{ macbookInventry.usb_id | get_devicename_from_id}}' ,
+              '{{ macbookInventry.usb_id | get_deviceserial_no_from_id }}', 
+              '{{ macbookInventry.macbook_id | get_device_status }}')">Action</button>  
+
+
+            <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
+              Update
+            </a>
             </td>
           </tr>
+        {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <p>No data available</p>
+      {% endif %}
     </div>
   </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 
-<script>
-  $(document).ready(function() {
+<script> 
+  // Function to open modal and populate data
+  function openInventoryModal(userName, deviceName, deviceId, adapterName, deviceId, status) {
+
+    var stateSelect = $('#status');
+    stateSelect.empty();  // Clear existing options
+    var arrvalue = [
+      {'value': 0, 'text': "Not available"}, 
+      {'value': 1, 'text': "Available"}, 
+      {'value': 2, 'text': "Returned"}, 
+      {'value': 3, 'text': "Breakfix"}];
+
+    $.each(arrvalue, function(index, state) {
+        stateSelect.append($('<option>', {
+            value: state.value,
+            text: state.text,
+            selected: status == state.value  
+        }));
+    });
+
+
+  // Set other modal content
+    $('#userName').text(userName);
+    $('#deviceName').text(deviceName);
+    $('#deviceId').text(deviceId);
+    $('#adapterName').text(adapterName); 
+    $('#adapterId').text(deviceId);
+
+
+      // Handle click event for save button
+      $('#saveChangesBtn').click(function() {
+          // Get old device ID
+          var oldDeviceId = $('#deviceId').text();
+          // Get selected new device serial number
+          var selectedSerialNumber = $('#laptop_serial_numbers').find('option:selected').val();
+          // Alert old device ID and new device ID
+          alert("Old Device ID: " + oldDeviceId + "\nNew Device ID: " + selectedSerialNumber);
+
+
+
+
+
+      });
+
+    $('#inventoryModal').modal('show');
+  }
+
+
+  $('#status').change(function() {
+  if ($(this).val() == '3') { // "Breakfix" status
+    $('#availableDevices').show();
+    $('#availableSelect').show();
+
+    // You can fetch and populate the available devices dynamically here
+  } else if  ($(this).val() == '2' ) { // "Breakfix" status
+    $('#availableDevices').show();
+    $('#availableSelect').hide();
+    // You can fetch and populate the available devices dynamically here
+  } 
+  
+  else {
+    $('#availableDevices').hide();
+  }
+});
+
+$(document).ready(function() {
     // Initialize DataTable
     $('#inventoryTable').DataTable();
+     setTimeout(function() {
+            var alertContainer = document.getElementById('alertContainer');
+            alertContainer.parentNode.removeChild(alertContainer);
+        }, 5000);
   });
+
 </script>
+
 {% endblock body %}
