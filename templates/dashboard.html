@@ -89,9 +89,9 @@
               {% endif %}
           </td>
             <td>
-              <a href="{% url 'asign_and_breakfis' macbookInventry.id %}" class="btn btn-primary btn-sm">
-                    Breakfix
-                </a>
+              <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
+                  Update
+              </a>
             </td>
           </tr>
         {% endfor %}
@@ -107,6 +107,10 @@
   $(document).ready(function() {
     // Initialize DataTable
     $('#inventoryTable').DataTable();
+     setTimeout(function() {
+            var alertContainer = document.getElementById('alertContainer');
+            alertContainer.parentNode.removeChild(alertContainer);
+        }, 5000);
   });
 </script>
 {% endblock body %}

@@ -18,7 +18,8 @@ urlpatterns = [
     path('delete_user/<int:user_id>/', views.delete_deviceuser, name='delete_user'),
     path('assign_macbook/', views.assign_macbook, name='assign_macbook'),
     path('logout/', views.logout_view, name='logout'),
-    path('asign_and_breakfis/<int:id>/', views.asign_and_breakfis, name='asign_and_breakfis'),
+    path('update_macbook/<int:id>/', views.update_macbook_by_id, name='update_macbook'),
+    path('update_macbook_by_id/', views.update_macbook, name='update_macbook_by_id'),
 ]
 
 if settings.DEBUG:

@@ -71,7 +71,7 @@
             <select class="form-control choices-single" name="device" id="device" aria-label="type">
               <option selected value="">Please select device</option>
                 {% for laptop in laptops %}
-                    <option value="{{laptop.id}}">{{laptop.serial_no}}</option>
+                    <option value="{{laptop.id}}">{{ laptop.name }} ({{ laptop.serial_no }})</option>
                 {% endfor %}
             </select>
         </div>
@@ -80,7 +80,7 @@
             <select class="form-control choices-single" name="adapter" id="adapter" aria-label="type">
               <option selected value="">Please select device</option>
                 {% for adapter in adapters %}
-                    <option value={{adapter.id}}>{{adapter.serial_no}}</option>
+                    <option value={{adapter.id}}>{{adapter.name}} ({{adapter.serial_no}})</option>
                 {% endfor %}
             </select>
         </div>
@@ -91,8 +91,8 @@
             <input type="text" class="form-control" name="tracking_no" {% if macbookInventryData.tracking_no != "" %} value="{{ macbookInventryData.tracking_no }}" {% endif %} id="tracking_no" aria-describedby="trackingHelp">
         </div>
         <div class="col-4">
-            <label class="form-label">DateTime</label>
-            <input type="datetime-local" class="form-control" name="datetime" id="datetime" aria-describedby="dateTimeHelp">
+            <label class="form-label">Shipment dateTime <span class="text-danger">*</span></label>
+            <input type="datetime-local" class="form-control" name="shipment_datetime" id="shipment_datetime" aria-describedby="dateTimeHelp">
         </div>
         <div class="col-4">
             <label class="form-label">Tkacking Slip</label>
