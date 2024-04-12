@@ -281,7 +281,7 @@ def assign_macbook(request):
     if request.user.is_anonymous:
         return redirect("/")
     deviceusers = DeviceUser.objects.filter(status=1)
-    laptops = Inventry.objects.filter(type='laptop', status=1)
+    laptops = Inventry.objects.filter(type='laptop', status__in=[1, 2])
     adapters = Inventry.objects.filter(type='adapter', status=1)
     if request.method == "POST":
         tracking_slip = request.FILES.get('tracking_slpi')
@@ -300,6 +300,11 @@ def assign_macbook(request):
         tracking_no = request.POST.get('tracking_no')
         datetimes = request.POST.get('shipment_datetime')
         other_information = request.POST.get('other_information')
+        status = request.POST.get('status')
+        if(status):
+            status = request.POST.get('status')
+        else:
+            status = 1
         macbookInventryData = {
             'user': deviceuser_id,
             'device': inventry_id,
@@ -322,7 +327,7 @@ def assign_macbook(request):
             error_message = "Datetime cannot be empty."
             return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
-        macbookInventry = MacbookInventry(macbook_id=inventry_id, usb_id=adapter, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=1, other_info=other_information,
+        macbookInventry = MacbookInventry(macbook_id=inventry_id, usb_id=adapter, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=status, other_info=other_information,
                             created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
                             updated_by=request.user.username, shipment_datetime=datetimes, photo=tracking_slip_path)
         macbookInventry.save()
@@ -431,3 +436,11 @@ def update_macbook(request):
     adapters = Inventry.objects.filter(type='adapter')
     macbookInventryData = get_object_or_404(MacbookInventry, pk=assign_id)
     return render(request, 'update_macbook.html', {'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
+
+def render_demo_html(request):
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        assignMackbook = MacbookInventry.objects.get(pk=id)
+        laptops = Inventry.objects.filter(type='laptop', status__in=[1, 2])
+        return render(request, 'modal.html', {'assignMackbook': assignMackbook, 'laptops':laptops})
+    return redirect('dashboard')

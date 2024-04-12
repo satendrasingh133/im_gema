@@ -62,7 +62,7 @@
             <th>Username</th>
             <th>Device</th>
             <th>Adapter</th>
-            <th>Date</th>
+            <th>Status</th>
             <th>File</th>
             <th>Action</th>
           </tr>
@@ -82,7 +82,16 @@
               <br>
               {{ macbookInventry.usb_id | get_deviceserial_no_from_id}}
             </td>
-            <td>{{macbookInventry.datetime}}</td>
+            <td>
+                {% if macbookInventry.shipment_datetime %}
+                    {% if macbookInventry.delivery_datetime %}
+                        Delevered
+                    {% else %}
+                        On the way
+                    {% endif %}
+                {% endif %}
+
+            </td>
            <td>
               {% if macbookInventry.photo %}
                   <a href="{{ MEDIA_URL }}{{ macbookInventry.photo }}" target="_blank">file</a>
@@ -91,6 +100,9 @@
             <td>
               <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
                   Update
+              </a>
+              <a href="javascript:void(0)" id="openModalLink" onclick="openModalLink('{{macbookInventry.id}}')" class="btn btn-primary btn-sm">
+                  action
               </a>
             </td>
           </tr>
@@ -103,7 +115,43 @@
     </div>
   </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal_body">
+                Modal Content Goes Here
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function openModalLink(id){
+        $('#myModal').modal('show');
+    $.ajax({
+        url: '/render_demo_html/',
+        type: 'GET',
+        data: {
+            id: id
+        },
+        success: function(response) {
+            // Populate the modal body with the response HTML
+            $('#modal_body').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            alert('Error occurred while loading modal content');
+        }
+    });
+    }
   $(document).ready(function() {
     // Initialize DataTable
     $('#inventoryTable').DataTable();

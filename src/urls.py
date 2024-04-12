@@ -20,6 +20,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('update_macbook/<int:id>/', views.update_macbook_by_id, name='update_macbook'),
     path('update_macbook_by_id/', views.update_macbook, name='update_macbook_by_id'),
+    path('render_demo_html/', views.render_demo_html, name='render_demo_html'),
 ]
 
 if settings.DEBUG:
