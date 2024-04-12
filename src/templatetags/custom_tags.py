@@ -1,5 +1,5 @@
 from django import template
-from ..models import DeviceUser, Inventry  # Import your model
+from ..models import DeviceUser, Inventry, MacbookInventry # Import your model
 
 register = template.Library()
 
@@ -37,3 +37,9 @@ def get_device_status(device_id):
 def get_available_laptop_serial_numbers(type):   
     laptops = Inventry.objects.filter(type=type, status__in=[1, 2])
     return laptops
+
+@register.filter
+def get_laptop_adapter_id(user_id):   
+    id = MacbookInventry.objects.get(deviceuser_id=user_id)
+    return id.macbook_id, id.usb_id
+
