@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-
 {% load custom_tags %}
-
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-3">
@@ -40,105 +38,6 @@
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Modal for inventory details -->
-<div class="modal fade" id="inventoryModal" tabindex="-1" aria-labelledby="inventoryModalLabel" aria-hidden="true">
-
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="inventoryModalLabel">Inventory Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-
-
-
-      <div class="modal-body">
-        <!-- Display user name, device name, adapter name, and status dropdown here -->
-        {{ user_id | get_laptop_adapter_id}}
-     
-        <form method="POST" action="/update_device_status/"  enctype="multipart/form-data">
-          {% csrf_token %}
-          <p><b>User:</b> <span id="userName"></span></p>
-          <p><b>Device:</b> <span id="deviceName"></span> (<span id="deviceId"></span>)</p>
-          <p><b>Adapter:</b> <span id="adapterName"></span> (<span id="adapterId"></span>)</p>
-          <label for="status">Status:</label>
-          <select class="form-select" name="status" id="status" aria-label="status">   
-          </select>       
-
-
-          <div id="availableDevices" style="display: none;" class="mt-3">
-            <div id="availableSelect" style="display: block;" class="mt-3">
-              <label for="availableDevice">Available Devices:</label>
-              {% load custom_tags %}
-              <select class="form-select" name="laptop_serial_numbers" id="laptop_serial_numbers">
-                {% for device in 'laptop'|get_available_laptop_serial_numbers %}
-                    <option value="{{ device.id }}">{{ device.serial_no }}</option>
-                {% endfor %}
-              </select> 
-            </div>
-
-
-          <div class="row mt-3">
-            <div class="col-12">
-                <label class="form-label">Tkacking No</label>
-                <input type="text" class="form-control" name="tracking_no" value=""  id="tracking_no" aria-describedby="trackingHelp">
-            </div>
-            <div class="col-12 mt-3">
-                <label class="form-label">Shipment dateTime <span class="text-danger">*</span></label>
-                <input type="datetime-local" class="form-control" name="shipment_datetime" id="shipment_datetime" aria-describedby="dateTimeHelp">
-            </div>
-            <div class="col-12 mt-3">
-                <label class="form-label">Tkacking Slip</label>
-                <input type="file" class="form-control" name="tracking_slpi" id="tracking_slpi" aria-describedby="trackingSlipHelp">
-            </div>
-          </div>
-          <div class="row mt-12 mt-3">     
-            <div class="col-12">     
-              <label class="form-label">Other information</label>
-              <textarea id="other_information" name="other_information" class="form-control" required></textarea>
-            </div>
-              
-          </div>
-        </form>
-      </div>
-    </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="saveChangesBtn">Save</button>
-        <!-- Add submit button if needed -->
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="container mt-5">
   <div class="card">
     <div class="card-body">
@@ -163,7 +62,7 @@
             <th>Username</th>
             <th>Device</th>
             <th>Adapter</th>
-            <th>Date</th>
+            <th>Status</th>
             <th>File</th>
             <th>Action</th>
           </tr>
@@ -171,7 +70,7 @@
         <tbody>
         {% for macbookInventry in macbookInventrys %}
           <tr>
-            <td>1</td>
+            <td>{{ forloop.counter }}</td>
             <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
             <td>
               {{macbookInventry.macbook_id | get_devicename_from_id}}
@@ -183,26 +82,31 @@
               <br>
               {{ macbookInventry.usb_id | get_deviceserial_no_from_id}}
             </td>
-            <td>{{macbookInventry.datetime}}</td>
             <td>
+                {% if macbookInventry.shipment_datetime %}
+                    {% if macbookInventry.delivery_datetime %}
+                        Delevered
+                    {% else %}
+                        On the way
+                    {% endif %}
+                {% endif %}
+
+            </td>
+           <td>
               {% if macbookInventry.photo %}
                   <a href="{{ MEDIA_URL }}{{ macbookInventry.photo }}" target="_blank">file</a>
               {% endif %}
           </td>
-            <td>              
-              <button type="button" class="btn btn-primary" onclick="openInventoryModal(
-              '{{ macbookInventry.deviceuser_id}}', 
-              '{{ macbookInventry.deviceuser_id|get_username_from_id }}',  
-              '{{ macbookInventry.macbook_id | get_devicename_from_id }}',              
-              '{{  macbookInventry.macbook_id | get_deviceserial_no_from_id }}', 
-              '{{ macbookInventry.usb_id | get_devicename_from_id}}' ,
-              '{{ macbookInventry.usb_id | get_deviceserial_no_from_id }}', 
-              '{{ macbookInventry.macbook_id | get_device_status }}')">Action</button>  
-
-
-            <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
-              Update
-            </a>
+            <td>
+              <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
+                  Update
+              </a>
+              <a href="javascript:void(0)" id="openModalLink" onclick="openModalLink('{{macbookInventry.id}}')" class="btn btn-primary btn-sm">
+                  Action
+              </a>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openDetailModal('{{macbookInventry.deviceuser_id}}')">
+                Detail
+            </button>
             </td>
           </tr>
         {% endfor %}
@@ -215,72 +119,91 @@
   </div>
 </div>
 
-<script> 
-  // Function to open modal and populate data
-  function openInventoryModal(user_id,userName, deviceName, deviceId, adapterName, deviceId, status) {
 
-    var stateSelect = $('#status');
-    stateSelect.empty();  // Clear existing options
-    var arrvalue = [
-      {'value': 0, 'text': "Not available"}, 
-      {'value': 1, 'text': "Available"}, 
-      {'value': 2, 'text': "Returned"}, 
-      {'value': 3, 'text': "Breakfix"}];
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal_body">
+                Modal Content Goes Here
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    $.each(arrvalue, function(index, state) {
-        stateSelect.append($('<option>', {
-            value: state.value,
-            text: state.text,
-            selected: status == state.value  
-        }));
+<!-- Modal Big -->
+<div class="modal fade" id="myModalBig" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+          <div class="modal-header">           
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modal_bodyBig">
+              Modal Content Goes Here
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+
+
+
+
+function openDetailModal(id) {
+    $('#myModalBig').modal('show');
+    $.ajax({
+        url: '/get_user_data/',
+        type: 'GET',
+        data: {
+            id: id
+        },
+        success: function(response) {
+            // Populate the modal body with the response HTML
+            $('#modal_bodyBig').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            alert('Error occurred while loading modal content');
+        }
     });
-
-
-  // Set other modal content
-    $('#userName').text(userName);
-    $('#deviceName').text(deviceName);
-    $('#deviceId').text(deviceId);
-    $('#adapterName').text(adapterName); 
-    $('#adapterId').text(deviceId);
-
-
-      // Handle click event for save button
-      $('#saveChangesBtn').click(function() {
-          // Get old device ID
-          var oldDeviceId = $('#deviceId').text();
-          // Get selected new device serial number
-          var selectedSerialNumber = $('#laptop_serial_numbers').find('option:selected').val();
-          // Alert old device ID and new device ID
-          alert("Old Device ID: " + oldDeviceId + "\nNew Device ID: " + selectedSerialNumber);
+}
 
 
 
 
+    function openModalLink(id){
+        $('#myModal').modal('show');
+    $.ajax({
+        url: '/render_demo_html/',
+        type: 'GET',
+        data: {
+            id: id
+        },
+        success: function(response) {
+            // Populate the modal body with the response HTML
+            $('#modal_body').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            alert('Error occurred while loading modal content');
+        }
+    });
+    }
 
-      });
-
-    $('#inventoryModal').modal('show');
-  }
 
 
-  $('#status').change(function() {
-  if ($(this).val() == '3') { // "Breakfix" status
-    $('#availableDevices').show();
-    $('#availableSelect').show();
-
-    // You can fetch and populate the available devices dynamically here
-  } else if  ($(this).val() == '2' ) { // "Breakfix" status
-    $('#availableDevices').show();
-    $('#availableSelect').hide();
-    // You can fetch and populate the available devices dynamically here
-  } 
-  
-  else {
-    $('#availableDevices').hide();
-  }
-});
-
-$(document).ready(function() {
+  $(document).ready(function() {
     // Initialize DataTable
     $('#inventoryTable').DataTable();
      setTimeout(function() {
@@ -288,7 +211,5 @@ $(document).ready(function() {
             alertContainer.parentNode.removeChild(alertContainer);
         }, 5000);
   });
-
 </script>
-
 {% endblock body %}

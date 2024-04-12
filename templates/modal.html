@@ -1,0 +1,205 @@
+{% load custom_tags %}
+<form id="form_id" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>
+        <b>User:</b>
+        <span id="userName"></span> {{ assignMackbook.deviceuser_id|get_username_from_id }}
+    </p>
+    <p>
+        <b>Device:</b>
+        <span id="deviceName"></span> {{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})
+    </p>
+    <p>
+        <b>Adapter:</b>
+        <span id="adapterName"></span> {{assignMackbook.usb_id | get_devicename_from_id}} ({{ assignMackbook.usb_id | get_deviceserial_no_from_id}})
+    </p>
+    <input type="hidden" name="user" value="{{assignMackbook.deviceuser_id}}">
+    <input type="hidden" name="adapter" value="{{assignMackbook.usb_id}}">
+    <div>
+      <label for="status">Status <span class="text-danger">*</span></label>
+      <select class="form-select" name="status" id="status" aria-label="status">
+          <option value="">Please select</option>
+          <option value=3>Breakfix</option>
+          <option value=2>Return</option>
+      </select>
+    </div>
+    <div id="return_macbook"></div>
+    <div class="mt-3" id="return_status" style="display: none;">
+        <label>Please choose status type <span class="text-danger">*</span></label><br>
+        <div class="form-check form-check-inline">
+             <input class="form-check-input" type="radio" name="inlineRadioOptions" id="resign" value="resign">
+             <label class="form-check-label" for="resign">Resign</label>
+        </div>
+        <div class="form-check form-check-inline">
+             <input class="form-check-input" type="radio" name="inlineRadioOptions" id="damage" value="damage">
+             <label class="form-check-label" for="damage">Damage</label>
+        </div>
+        <div class="mt-3" id="device_for_return" style="display: none;">
+            <label>Please choose devices for return <span class="text-danger">*</span></label><br>
+            <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="{{assignMackbook.macbook_id}}" id="selected_device1">
+                  <label class="form-check-label" for="selected_device1">
+                    {{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})
+                  </label>
+            </div>
+            <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="{{assignMackbook.usb_id}}" id="selected_device2">
+                  <label class="form-check-label" for="selected_device2">
+                    {{assignMackbook.usb_id | get_devicename_from_id}} ({{ assignMackbook.usb_id | get_deviceserial_no_from_id}})
+                  </label>
+            </div>
+        </div>
+    </div>
+    <div id="availableDevice" class="mt-3" style="display: none">
+        <label>Available Devices <span class="text-danger">*</span></label>
+        <select class="form-control choices-single" name="device" id="device" aria-label="type">
+            <option selected value="">Please select device</option>
+            {% for laptop in laptops %}
+                <option value="{{laptop.id}}">{{ laptop.name }} ({{ laptop.serial_no }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="row mt-3" id="tracking_details" style="display: none">
+        <div class="col-12">
+            <label class="form-label">Tkacking No <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="tracking_no" value="" id="tracking_no" aria-describedby="trackingHelp">
+        </div>
+        <div class="col-12 mt-3">
+            <label class="form-label">Shipment dateTime <span class="text-danger">*</span>
+            </label>
+            <input type="datetime-local" class="form-control" name="shipment_datetime" id="shipment_datetime" aria-describedby="dateTimeHelp">
+        </div>
+        <div class="col-12 mt-3">
+            <label class="form-label">Tkacking Slip <span class="text-danger">*</span></label>
+            <input type="file" class="form-control" name="tracking_slpi" id="tracking_slpi" aria-describedby="trackingSlipHelp">
+        </div>
+        <div class="col-12 mt-3">
+            <label class="form-label">Other information</label>
+            <textarea id="other_information" name="other_information" class="form-control"></textarea>
+        </div>
+        <div class="col-12 mt-3">
+            {% if error_message %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{error_message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+        </div>
+    </div>
+</form>
+<script>
+    $('#status').change(function(){
+       var status = $(this).val();
+       if(status==3){
+           $('#return_macbook').hide();
+           $('#availableDevice').show();
+           $('#tracking_details').show();
+           $('#return_status').hide();
+       }else if(status==2){
+           $('#availableDevice').hide();
+           $('#tracking_details').show();
+           $('#return_status').show();
+           $('#return_macbook').html('<input type="hidden" name="device" value="{{assignMackbook.macbook_id}}">')
+       }else{
+           $('#return_status').hide();
+           $('#availableDevice').hide();
+           $('#tracking_details').hide();
+           $('#return_macbook').hide();
+       }
+    })
+    $(document).ready(function(){
+        $('input[type=radio][name=inlineRadioOptions]').change(function() {
+            var selectedValue = $(this).val();
+            if(selectedValue=="resign"){
+                $('#device_for_return').show();
+            }else if(selectedValue=="damage"){
+                $('#device_for_return').hide();
+            }else{
+                $('#device_for_return').hide();
+            }
+        });
+    $('#form_id').submit(function(event) {
+        var status = $('#status').val();
+        if(status=="" || status==null || status===undefined){
+            $('#status').css('border', '2px solid red');
+            return false;
+        }else{
+            $('#status').css('border', '1px solid gray');
+            if(status==3){
+                $('#return_macbook').hide();
+                var device = $('#device').val();
+                if(device=="" || device==null || device===undefined){
+                    $('#device').css('border', '2px solid red');
+                    return false;
+                }else{
+                     $('#device').css('border', '1px solid gray');
+                }
+            }else if(status==2){
+                var status_type = $('input[type=radio][name=inlineRadioOptions]:checked').val();
+                if(status_type=="" || status_type==null || status_type===undefined){
+                    $('#return_status').css('border', '2px solid red');
+                    return false;
+                }else{
+                    $('#return_status').css('border', 'none');
+                    if(status_type=="resign"){
+                        // get selected device
+                        var selectedDevices = [];
+                        $('input[type=checkbox]:checked').each(function() {
+                            selectedDevices.push($(this).val());
+                        });
+                        if(selectedDevices=="" || selectedDevices==null){
+                             $('#device_for_return').css('border', '2px solid red');
+                            return false;
+                        }else{
+                            $('#device_for_return').css('border', 'none');
+                        }
+                    }
+                }
+            }
+        }
+        var tracking_no = $('#tracking_no').val();
+        if(tracking_no=="" || tracking_no==null || tracking_no===undefined){
+            $('#tracking_no').css('border', '2px solid red');
+            return false;
+        }else {
+            $('#tracking_no').css('border', '1px solid gray');
+        }
+        var shipment_datetime = $('#shipment_datetime').val();
+        if(shipment_datetime=="" || shipment_datetime==null || shipment_datetime===undefined){
+            $('#shipment_datetime').css('border', '2px solid red');
+            return false;
+        }else {
+            $('#shipment_datetime').css('border', '1px solid gray');
+        }
+        var tracking_slpi = $('#tracking_slpi').val();
+        if(tracking_slpi=="" || tracking_slpi==null || tracking_slpi===undefined){
+            $('#tracking_slpi').css('border', '2px solid red');
+            return false;
+        }else {
+            $('#tracking_slpi').css('border', '1px solid gray');
+        }
+        var other_information = $('#other_information').val();
+        if(other_information=="" || other_information==null || other_information===undefined){
+            $('#other_information').css('border', '2px solid red');
+            return false;
+        }else {
+            $('#other_information').css('border', '1px solid gray');
+        }
+        $.ajax({
+            url: '/assign_macbook/',
+            type: 'POST',
+            data: new FormData($('#form_id')[0]), // Serialize the form data
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Handle success response
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                alert('Error occurred while submitting the form');
+            }
+        });
+    });
+});
+</script>

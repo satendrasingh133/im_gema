@@ -1,0 +1,56 @@
+<style type="text/css">
+    .modal-dialog {
+        width: 1200px!important;
+    }
+</style>
+{% load custom_tags %}
+{% if macbookInventrys %}
+<div class="container">  
+    <h3>User Data of : {{ macbookInventrys.0.deviceuser_id|get_username_from_id }}</h3>    
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Macbook</th>
+                <th>Adapter</th>               
+                <th>Photo</th>
+                <th>Tracking No</th>             
+                <th>Other Info</th>
+                <th>Status</th>
+                <th>Shipment Date</th>    
+                <th>Delivery Date</th>               
+            </tr>
+        </thead>
+        <tbody>         
+            {% for macbookInventry in macbookInventrys %}
+            <tr>     
+                <td>{{ macbookInventry.macbook_id | get_devicename_from_id }}
+                    <br>
+                    {{ macbookInventry.macbook_id | get_deviceserial_no_from_id }}
+                </td>
+                <td>{{ macbookInventry.usb_id | get_devicename_from_id }}
+                    <br>
+                    {{ macbookInventry.usb_id | get_deviceserial_no_from_id }}
+                </td>
+                <td><a href="{{ MEDIA_URL }}{{ macbookInventry.photo }}" target="_blank">file</a></td>
+                <td>{{ macbookInventry.tracking_no }}</td>
+                <td>{{ macbookInventry.other_info }}</td>
+                <td>
+                    {% if macbookInventry.status == 0 %}
+                    N/A
+                    {% elif macbookInventry.status == 1 %}
+                    Available
+                    {% elif macbookInventry.status == 2 %}
+                    Returned
+                    {% elif macbookInventry.status == 3 %}
+                    Breakfix
+                    {% endif %}
+                </td>
+                <td>{{ macbookInventry.shipment_datetime }}</td>
+                <td>{{ macbookInventry.delivery_datetime }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
