@@ -24,6 +24,32 @@
       </select>
     </div>
     <div id="return_macbook"></div>
+    <div class="mt-3" id="return_status" style="display: none;">
+        <label>Please choose status type <span class="text-danger">*</span></label><br>
+        <div class="form-check form-check-inline">
+             <input class="form-check-input" type="radio" name="inlineRadioOptions" id="resign" value="resign">
+             <label class="form-check-label" for="resign">Resign</label>
+        </div>
+        <div class="form-check form-check-inline">
+             <input class="form-check-input" type="radio" name="inlineRadioOptions" id="damage" value="damage">
+             <label class="form-check-label" for="damage">Damage</label>
+        </div>
+        <div class="mt-3" id="device_for_return" style="display: none;">
+            <label>Please choose devices for return <span class="text-danger">*</span></label><br>
+            <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="{{assignMackbook.macbook_id}}" id="selected_device1">
+                  <label class="form-check-label" for="selected_device1">
+                    {{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})
+                  </label>
+            </div>
+            <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="{{assignMackbook.usb_id}}" id="selected_device2">
+                  <label class="form-check-label" for="selected_device2">
+                    {{assignMackbook.usb_id | get_devicename_from_id}} ({{ assignMackbook.usb_id | get_deviceserial_no_from_id}})
+                  </label>
+            </div>
+        </div>
+    </div>
     <div id="availableDevice" class="mt-3" style="display: none">
         <label>Available Devices <span class="text-danger">*</span></label>
         <select class="form-control choices-single" name="device" id="device" aria-label="type">
@@ -69,17 +95,30 @@
            $('#return_macbook').hide();
            $('#availableDevice').show();
            $('#tracking_details').show();
+           $('#return_status').hide();
        }else if(status==2){
            $('#availableDevice').hide();
            $('#tracking_details').show();
+           $('#return_status').show();
            $('#return_macbook').html('<input type="hidden" name="device" value="{{assignMackbook.macbook_id}}">')
        }else{
+           $('#return_status').hide();
            $('#availableDevice').hide();
            $('#tracking_details').hide();
            $('#return_macbook').hide();
        }
     })
     $(document).ready(function(){
+        $('input[type=radio][name=inlineRadioOptions]').change(function() {
+            var selectedValue = $(this).val();
+            if(selectedValue=="resign"){
+                $('#device_for_return').show();
+            }else if(selectedValue=="damage"){
+                $('#device_for_return').hide();
+            }else{
+                $('#device_for_return').hide();
+            }
+        });
     $('#form_id').submit(function(event) {
         var status = $('#status').val();
         if(status=="" || status==null || status===undefined){
@@ -95,6 +134,27 @@
                     return false;
                 }else{
                      $('#device').css('border', '1px solid gray');
+                }
+            }else if(status==2){
+                var status_type = $('input[type=radio][name=inlineRadioOptions]:checked').val();
+                if(status_type=="" || status_type==null || status_type===undefined){
+                    $('#return_status').css('border', '2px solid red');
+                    return false;
+                }else{
+                    $('#return_status').css('border', 'none');
+                    if(status_type=="resign"){
+                        // get selected device
+                        var selectedDevices = [];
+                        $('input[type=checkbox]:checked').each(function() {
+                            selectedDevices.push($(this).val());
+                        });
+                        if(selectedDevices=="" || selectedDevices==null){
+                             $('#device_for_return').css('border', '2px solid red');
+                            return false;
+                        }else{
+                            $('#device_for_return').css('border', 'none');
+                        }
+                    }
                 }
             }
         }
@@ -126,7 +186,6 @@
         }else {
             $('#other_information').css('border', '1px solid gray');
         }
-
         $.ajax({
             url: '/assign_macbook/',
             type: 'POST',
