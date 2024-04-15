@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 <script>
+
     $(document).ready(function() {
         var stateUser = $('#user');
         var selectedUser = '{{ macbookInventryData.deviceuser_id }}';
@@ -46,9 +47,7 @@
                 allowClear: true
             });
         }
-
     })
-
 </script>
 <div class="mt-5 mb-5" >
     {% if error_message %}
@@ -99,9 +98,9 @@
             <label class="form-label">Delivery dateTime <span class="text-danger">*</span></label>
             <input type="datetime-local" class="form-control" name="devilery_datetime" id="devilery_datetime"
                     {% if macbookInventryData.delivery_datetime %}
-                   value="{{ macbookInventryData.delivery_datetime|date:'Y-m-d\TH:i' }}"
-               {% endif %}
-                   aria-describedby="dateTimeHelp">
+                        value="{{ macbookInventryData.delivery_datetime|date:'Y-m-d\TH:i' }}"
+                    {% endif %}
+                   aria-describedby="dateTimeHelp" min="{{ macbookInventryData.shipment_datetime|date:'Y-m-d\TH:i' }}">
         </div>
         <div class="col-4">
             <label class="form-label">Tkacking Slip</label> {% if macbookInventryData.photo != "" %} <a href="{{ MEDIA_URL }}{{ macbookInventryData.photo }}" target="_blank">Uploaded file</a> {% endif %}

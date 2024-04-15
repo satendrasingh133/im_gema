@@ -7,7 +7,8 @@
     </p>
     <p>
         <b>Device:</b>
-        <span id="deviceName"></span> {{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})
+        <span id="deviceName"></span>
+        <span id="new_device">{{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})</span>
     </p>
     <p>
         <b>Adapter:</b>
@@ -34,6 +35,12 @@
              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="damage" value="damage">
              <label class="form-check-label" for="damage">Damage</label>
         </div>
+        <p id="old_device" style="display: none">
+            {% if assignMackbook.deviceuser_id|get_breakfixMacbook %}
+                <b>Breakfix Device:</b>
+                {{ assignMackbook.deviceuser_id|get_breakfixMacbook }}
+            {% endif %}
+        </p>
         <div class="mt-3" id="device_for_return" style="display: none;">
             <label>Please choose devices for return <span class="text-danger">*</span></label><br>
             <div class="form-check">
@@ -91,6 +98,9 @@
 <script>
     $('#status').change(function(){
        var status = $(this).val();
+       $('#old_device').hide();
+       var macId = "{{ assignMackbook.macbook_id }}"
+        $('#device').val(macId)
        if(status==3){
            $('#availableDevice').show();
            $('#tracking_details').show();
@@ -104,6 +114,16 @@
            $('#availableDevice').hide();
            $('#tracking_details').hide();
        }
+    })
+    $('#damage').click(function(){
+        $('#old_device').show();
+        var macId = "{{ assignMackbook.deviceuser_id|get_breakfixMacbookId }}"
+        $('#device').val(macId)
+    })
+    $('#resign').click(function(){
+        $('#old_device').hide();
+        var macId = "{{ assignMackbook.macbook_id }}"
+        $('#device').val(macId)
     })
     $(document).ready(function(){
         $('input[type=radio][name=inlineRadioOptions]').change(function() {
