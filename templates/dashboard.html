@@ -101,9 +101,16 @@
               <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
                   Update
               </a>
+              {% if macbookInventry.shipment_datetime %}
+              {% if macbookInventry.delivery_datetime %}
               <a href="javascript:void(0)" id="openModalLink" onclick="openModalLink('{{macbookInventry.id}}')" class="btn btn-primary btn-sm">
-                  Action
-              </a>
+                Action
+            </a>
+              {% endif %}
+          {% endif %}
+
+
+             
               <button type="button" class="btn btn-primary btn-sm" onclick="openDetailModal('{{macbookInventry.deviceuser_id}}')">
                 Detail
             </button>

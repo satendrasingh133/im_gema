@@ -7,7 +7,8 @@
     </p>
     <p>
         <b>Device:</b>
-        <span id="deviceName"></span> {{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})
+        <span id="deviceName"></span>
+        <span id="new_device">{{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})</span>
     </p>
     <p>
         <b>Adapter:</b>
@@ -15,6 +16,7 @@
     </p>
     <input type="hidden" name="user" value="{{assignMackbook.deviceuser_id}}">
     <input type="hidden" name="adapter" value="{{assignMackbook.usb_id}}">
+    <input type="hidden" name="device" id="device" value="{{assignMackbook.macbook_id}}">
     <div>
       <label for="status">Status <span class="text-danger">*</span></label>
       <select class="form-select" name="status" id="status" aria-label="status">
@@ -23,7 +25,6 @@
           <option value=2>Return</option>
       </select>
     </div>
-    <div id="return_macbook"></div>
     <div class="mt-3" id="return_status" style="display: none;">
         <label>Please choose status type <span class="text-danger">*</span></label><br>
         <div class="form-check form-check-inline">
@@ -34,16 +35,22 @@
              <input class="form-check-input" type="radio" name="inlineRadioOptions" id="damage" value="damage">
              <label class="form-check-label" for="damage">Damage</label>
         </div>
+        <p id="old_device" style="display: none">
+            {% if assignMackbook.deviceuser_id|get_breakfixMacbook != "na" %}
+                <b>Breakfix Device:</b>
+                {{ assignMackbook.deviceuser_id|get_breakfixMacbook }}
+            {% endif %}
+        </p>
         <div class="mt-3" id="device_for_return" style="display: none;">
             <label>Please choose devices for return <span class="text-danger">*</span></label><br>
             <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="{{assignMackbook.macbook_id}}" id="selected_device1">
+                  <input class="form-check-input" type="checkbox" name="deviceforreturn" value="{{assignMackbook.macbook_id}}" id="selected_device1">
                   <label class="form-check-label" for="selected_device1">
                     {{assignMackbook.macbook_id | get_devicename_from_id}} ({{ assignMackbook.macbook_id | get_deviceserial_no_from_id}})
                   </label>
             </div>
             <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="{{assignMackbook.usb_id}}" id="selected_device2">
+                  <input class="form-check-input" type="checkbox" name="deviceforreturn" value="{{assignMackbook.usb_id}}" id="selected_device2">
                   <label class="form-check-label" for="selected_device2">
                     {{assignMackbook.usb_id | get_devicename_from_id}} ({{ assignMackbook.usb_id | get_deviceserial_no_from_id}})
                   </label>
@@ -52,7 +59,7 @@
     </div>
     <div id="availableDevice" class="mt-3" style="display: none">
         <label>Available Devices <span class="text-danger">*</span></label>
-        <select class="form-control choices-single" name="device" id="device" aria-label="type">
+        <select class="form-control choices-single" name="deviceselected" id="deviceselected" aria-label="type">
             <option selected value="">Please select device</option>
             {% for laptop in laptops %}
                 <option value="{{laptop.id}}">{{ laptop.name }} ({{ laptop.serial_no }})</option>
@@ -91,22 +98,34 @@
 <script>
     $('#status').change(function(){
        var status = $(this).val();
+       $('#old_device').hide();
+       var macId = "{{ assignMackbook.macbook_id }}"
+        $('#device').val(macId)
        if(status==3){
-           $('#return_macbook').hide();
            $('#availableDevice').show();
            $('#tracking_details').show();
            $('#return_status').hide();
        }else if(status==2){
-           $('#availableDevice').hide();
+           $('#availableDevice').remove();
            $('#tracking_details').show();
            $('#return_status').show();
-           $('#return_macbook').html('<input type="hidden" name="device" value="{{assignMackbook.macbook_id}}">')
        }else{
            $('#return_status').hide();
            $('#availableDevice').hide();
            $('#tracking_details').hide();
-           $('#return_macbook').hide();
        }
+    })
+    $('#damage').click(function(){
+        $('#old_device').show();
+        {% if assignMackbook.deviceuser_id|get_breakfixMacbookId > 0 %}
+            var macId = "{{ assignMackbook.deviceuser_id|get_breakfixMacbookId }}";
+            $('#device').val(macId);
+        {% endif %}
+    })
+    $('#resign').click(function(){
+        $('#old_device').hide();
+        var macId = "{{ assignMackbook.macbook_id }}"
+        $('#device').val(macId)
     })
     $(document).ready(function(){
         $('input[type=radio][name=inlineRadioOptions]').change(function() {
@@ -127,14 +146,14 @@
         }else{
             $('#status').css('border', '1px solid gray');
             if(status==3){
-                $('#return_macbook').hide();
-                var device = $('#device').val();
-                if(device=="" || device==null || device===undefined){
-                    $('#device').css('border', '2px solid red');
+                var deviceselected = $('#deviceselected').val();
+                if(deviceselected=="" || deviceselected==null || deviceselected===undefined){
+                    $('#deviceselected').css('border', '2px solid red');
                     return false;
                 }else{
-                     $('#device').css('border', '1px solid gray');
+                     $('#deviceselected').css('border', '1px solid gray');
                 }
+               $('#device').val(deviceselected);
             }else if(status==2){
                 var status_type = $('input[type=radio][name=inlineRadioOptions]:checked').val();
                 if(status_type=="" || status_type==null || status_type===undefined){

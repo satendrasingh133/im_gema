@@ -21,7 +21,7 @@
     });
 </script>
 <div class="mt-5 mb-5" >
-<h2 class="mb-3">Update inventry</h2>
+<h2 class="mb-3">Update inventory</h2>
 {% if error_message %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
       {{error_message}}
@@ -50,14 +50,24 @@
     </div>
     <div id="inventryForm" class="mt-4" style="display: none">
         <div class="row">
-            <div class="col-6">
+            <div class="col-4">
                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" required name="name" {% if inventry.name != "" %} value="{{ inventry.name }}" {% endif %} id="name" aria-describedby="nameHelp">
 
             </div>
-            <div class="col-6">
+            <div class="col-4">
                 <label for="serial_number" class="form-label">Serial number <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" required name="serial_number" {% if inventry.serial_no != "" %} value="{{ inventry.serial_no }}" {% endif %} id="serial_number" oninput="this.value = this.value.toUpperCase()" aria-describedby="snumberHelp">
+            </div>
+            <div class="col-4">
+                <label for="serial_number" class="form-label">Status <span class="text-danger">*</span></label>
+                <select class="form-select" name="status" id="status" aria-label="status">
+                  <option selected value="">Please select</option>
+                  <option {% if inventry.status == 0 %} selected {% endif %} value=0>Not avaulable</option>
+                  <option {% if inventry.status == 1 %} selected {% endif %} value=1>Available</option>
+                  <option {% if inventry.status == 2 %} selected {% endif %} value=2>Returned</option>
+                  <option {% if inventry.status == 3 %} selected {% endif %} value=3>Beakfix</option>
+                </select>
             </div>
         </div>
         <div class="row">

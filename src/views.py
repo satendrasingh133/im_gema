@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.utils import timezone
 from django.db.models import Max
+from django.utils import timezone
 import os
 from urllib.parse import urlparse
 
@@ -29,21 +29,22 @@ def index(request):
         return redirect("dashboard")
     return render(request, 'index.html')
 
+
 def dashboard(request):
     if request.user.is_anonymous:
         return redirect("/")
-    
-   # Query to get the latest entry for each user
+
+    # Query to get the latest entry for each user
     latest_entries = MacbookInventry.objects.values('deviceuser_id').annotate(
         latest_created_at=Max('created_at')
     )
-    
+
     # Retrieve the complete objects corresponding to the latest entries
     macbookInventry = [
-        MacbookInventry.objects.filter(deviceuser_id=entry['deviceuser_id'], created_at=entry['latest_created_at']).first()
+        MacbookInventry.objects.filter(deviceuser_id=entry['deviceuser_id'],
+                                       created_at=entry['latest_created_at']).first()
         for entry in latest_entries
-    ]   
-
+    ]
 
     # macbookInventry = MacbookInventry.objects.all()
     return render(request, 'dashboard.html', {'macbookInventrys': macbookInventry})
@@ -315,10 +316,12 @@ def assign_macbook(request):
         datetimes = request.POST.get('shipment_datetime')
         other_information = request.POST.get('other_information')
         status = request.POST.get('status')
-        if(status):
-            status = request.POST.get('status')
-        else:
-            status = 1
+        status_type = ""
+        deviceforreturn = ""
+        if(request.POST.get('inlineRadioOptions')):
+            status_type = request.POST.get('inlineRadioOptions')
+        if(request.POST.getlist('deviceforreturn')):
+            deviceforreturn = request.POST.getlist('deviceforreturn')
         macbookInventryData = {
             'user': deviceuser_id,
             'device': inventry_id,
@@ -341,22 +344,54 @@ def assign_macbook(request):
             error_message = "Datetime cannot be empty."
             return render(request, 'assign_macbook.html', {'error_message': error_message, 'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
+        macbookstatus = 0
+        adapterstatus = 0
+        userstatus = 0
+        if status:
+            status = int(request.POST.get('status'))
+        else:
+            status = 1
+        if status == 3:
+            macbookData = MacbookInventry.objects.filter(deviceuser_id=deviceuser_id)
+            if macbookData:
+                for macbook in macbookData:
+                    macFilter = Inventry.objects.get(pk=macbook.macbook_id, status=0)
+                    if macFilter.name:
+                        macbookInventry1 = get_object_or_404(Inventry, pk=macFilter.id)
+                        macbookInventry1.status = 3
+                        macbookInventry1.save()
         macbookInventry = MacbookInventry(macbook_id=inventry_id, usb_id=adapter, deviceuser_id=deviceuser_id, tracking_no=tracking_no, status=status, other_info=other_information,
                             created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
                             updated_by=request.user.username, shipment_datetime=datetimes, photo=tracking_slip_path)
         macbookInventry.save()
+        if status == 3:
+            macbookstatus = 0
+            adapterstatus = 0
+            userstatus = 0
+        else:
+            if status_type == "resign":
+                macbookstatus = 2
+                adapterstatus = 2
+                userstatus = 2
+                if deviceforreturn:
+                    if deviceforreturn[0]:
+                        inventry_id = deviceforreturn[0]
+                    if deviceforreturn[1]:
+                        adapter = deviceforreturn[1]
+            elif status_type == "damage":
+                macbookstatus = 3
         # change status in inventry table
         macbookInventry = get_object_or_404(Inventry, pk=inventry_id)
-        macbookInventry.status = 0
+        macbookInventry.status = macbookstatus
         macbookInventry.save()
 
         adapterInventry = get_object_or_404(Inventry, pk=adapter)
-        adapterInventry.status = 0
+        adapterInventry.status = adapterstatus
         adapterInventry.save()
 
         # change status in deviceuser table
         deviceuser = get_object_or_404(DeviceUser, pk=deviceuser_id)
-        deviceuser.status = 0
+        deviceuser.status = userstatus
         deviceuser.save()
 
         # Optionally, you can return a success message
@@ -379,6 +414,9 @@ def update_macbook_by_id(request, id):
     laptops = Inventry.objects.filter(type='laptop')
     adapters = Inventry.objects.filter(type='adapter')
     macbookInventryData = get_object_or_404(MacbookInventry, pk=id)
+
+
+
     return render(request, 'update_macbook.html', {'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
 def update_macbook(request):
@@ -463,11 +501,10 @@ def render_demo_html(request):
 def get_user_data(request):
     if request.user.is_anonymous:
         return redirect("/")
-    
+
     # Assuming you have access to the user's ID through request.user.id
-    user_id = request.user.id
-    
+    user_id = request.GET.get('id')
+
     # Filter MacbookInventry objects based on the user's ID
     macbookInventry = MacbookInventry.objects.filter(deviceuser_id=user_id)
-    
     return render(request, 'user_data.html', {'macbookInventrys': macbookInventry})
