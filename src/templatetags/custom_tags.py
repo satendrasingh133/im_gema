@@ -37,7 +37,7 @@ def get_breakfixMacbook(deviceuser_id):
             if macFilter.name:
                 return macFilter.name + " (" + macFilter.serial_no +")"
     else:
-        return
+        return "na"
 
 @register.filter
 def get_breakfixMacbookId(deviceuser_id):
@@ -48,4 +48,4 @@ def get_breakfixMacbookId(deviceuser_id):
             if macFilter.name:
                 return macFilter.id
     else:
-        return
+        return 0

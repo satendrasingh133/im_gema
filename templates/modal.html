@@ -36,7 +36,7 @@
              <label class="form-check-label" for="damage">Damage</label>
         </div>
         <p id="old_device" style="display: none">
-            {% if assignMackbook.deviceuser_id|get_breakfixMacbook %}
+            {% if assignMackbook.deviceuser_id|get_breakfixMacbook != "na" %}
                 <b>Breakfix Device:</b>
                 {{ assignMackbook.deviceuser_id|get_breakfixMacbook }}
             {% endif %}
@@ -117,8 +117,10 @@
     })
     $('#damage').click(function(){
         $('#old_device').show();
-        var macId = "{{ assignMackbook.deviceuser_id|get_breakfixMacbookId }}"
-        $('#device').val(macId)
+        {% if assignMackbook.deviceuser_id|get_breakfixMacbookId > 0 %}
+            var macId = "{{ assignMackbook.deviceuser_id|get_breakfixMacbookId }}";
+            $('#device').val(macId);
+        {% endif %}
     })
     $('#resign').click(function(){
         $('#old_device').hide();
