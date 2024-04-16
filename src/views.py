@@ -10,8 +10,7 @@ from django.db.models import Max
 from django.utils import timezone
 import os
 from urllib.parse import urlparse
-
-# Create your views here.
+# code to check the login status of user if not then redirect to login page
 def index(request):
     if request.user.is_anonymous:
         if request.method == "POST":
@@ -30,6 +29,9 @@ def index(request):
     return render(request, 'index.html')
 
 
+
+
+# code to get the macbookInventry and users assigned device and total availabe devices
 def dashboard(request):
     if request.user.is_anonymous:
         return redirect("/")
@@ -49,16 +51,23 @@ def dashboard(request):
     # macbookInventry = MacbookInventry.objects.all()
     return render(request, 'dashboard.html', {'macbookInventrys': macbookInventry})
 
+
+# Code to logout 
 def logout_view(request):
     logout(request)
     # Redirect to a page after logout
     return redirect("/")
+
+
+# code to list the all Inventry data
 def list_inventry(request):
     if request.user.is_anonymous:
         return redirect("/")
     inventries = Inventry.objects.all()
     return render(request, 'inventry.html', {'inventries': inventries})
 
+
+# code to get the single Inventry detail by id
 def get_inventry_by_id(request, inventry_id):
     if request.user.is_anonymous:
         return redirect("/")
@@ -67,6 +76,9 @@ def get_inventry_by_id(request, inventry_id):
 
     # Render the template and pass the inventory item to the context
     return render(request, 'update_inventry.html', {'inventry': inventry})
+
+
+# code to add Inventry using modal
 def add_inventry(request):
     if request.user.is_anonymous:
         return redirect("/")
@@ -98,6 +110,8 @@ def add_inventry(request):
 
     return render(request, 'add_inventry.html')
 
+
+# code to update Inventry using id
 def update_inventry_data(request):
     if request.user.is_anonymous:
         return redirect("/")
@@ -125,12 +139,14 @@ def update_inventry_data(request):
     # Render the form template with the inventory item data
     return render(request, 'update_inventry.html', {'inventry': inventry})
 
+
+# Code to delete inventry from database
 def delete_inventry(request, inventry_id):
     inventry = get_object_or_404(Inventry, pk=inventry_id)
     inventry.delete()
     return redirect('list_inventry')
 
-
+# Code to add users with details 
 def create_deviceuser(request):
     if request.user.is_anonymous:
         return redirect("/")
@@ -213,13 +229,15 @@ def create_deviceuser(request):
 
     return render(request, 'add_deviceuser.html')
 
+
+# code to get the user overview (list)
 def user_overview(request):
     if request.user.is_anonymous:
         return redirect("/")
     deviceuser = DeviceUser.objects.all()
     return render(request, 'user_overview.html', {'deviceuser': deviceuser})
 
-
+# code to edite the user details
 def edit_user(request, user_id):
     if request.user.is_anonymous:
         return redirect("/")
@@ -292,6 +310,9 @@ def edit_user(request, user_id):
         return redirect('user_overview')
     return render(request, 'add_deviceuser.html', {'deviceuser': user})
 
+
+
+# code to assign the macbook to available user
 def assign_macbook(request):
     if request.user.is_anonymous:
         return redirect("/")
@@ -400,6 +421,11 @@ def assign_macbook(request):
         return redirect('dashboard')
 
     return render(request, 'assign_macbook.html', {'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
+
+
+
+
+# code to delet the user
 def delete_deviceuser(request, user_id):
     if request.user.is_anonymous:
         return redirect("/")
@@ -407,6 +433,8 @@ def delete_deviceuser(request, user_id):
     user.delete()
     return redirect('user_overview')
 
+
+# code to get the single assigned macbook by id
 def update_macbook_by_id(request, id):
     if request.user.is_anonymous:
         return redirect("/")
@@ -414,12 +442,11 @@ def update_macbook_by_id(request, id):
     laptops = Inventry.objects.filter(type='laptop')
     adapters = Inventry.objects.filter(type='adapter')
     macbookInventryData = get_object_or_404(MacbookInventry, pk=id)
-
-
-
     return render(request, 'update_macbook.html', {'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
-def update_macbook(request):
+
+#code to update assigned mackbook
+def update_assign_macbook(request):
     if request.user.is_anonymous:
         return redirect("/")
     assign_id = request.POST.get('assign_id')
@@ -489,7 +516,10 @@ def update_macbook(request):
     macbookInventryData = get_object_or_404(MacbookInventry, pk=assign_id)
     return render(request, 'update_macbook.html', {'macbookInventryData': macbookInventryData, 'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
-def render_demo_html(request):
+
+
+# code to open model on action click
+def render_modal_html(request):
     if request.method == 'GET':
         id = request.GET.get('id')
         assignMackbook = MacbookInventry.objects.get(pk=id)
@@ -498,6 +528,8 @@ def render_demo_html(request):
     return redirect('dashboard')
 
 
+
+# code get the all log of user based on id
 def get_user_data(request):
     if request.user.is_anonymous:
         return redirect("/")
