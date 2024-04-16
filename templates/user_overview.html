@@ -38,6 +38,7 @@
         <table id="userTable" class="table table-striped">
                 <thead>
                     <tr>
+                        <th>S. No</th>
                         <th>Name</th>
                         <th>Contact No</th>
                         <th>Email</th>
@@ -52,6 +53,7 @@
     <tbody>
         {% for user in deviceuser %}
         <tr>
+            <td>{{ forloop.counter }}</td>
             <td>{{ user.name }}</td>
             <td>{{ user.contact_no }}</td>
             <td>{{ user.email }}</td>

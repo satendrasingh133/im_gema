@@ -72,10 +72,14 @@
           <tr>
             <td>{{ forloop.counter }}</td>
             <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
-            <td>
+            <td>             
+
               {{macbookInventry.macbook_id | get_devicename_from_id}}
               <br>
               {{ macbookInventry.macbook_id | get_deviceserial_no_from_id}}
+
+
+
             </td>
            <td>
               {{macbookInventry.usb_id | get_devicename_from_id}}

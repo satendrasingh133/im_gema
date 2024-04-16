@@ -6,8 +6,9 @@ from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.utils import timezone
+from django.http import JsonResponse
 import os
 from urllib.parse import urlparse
 # code to check the login status of user if not then redirect to login page
@@ -35,21 +36,16 @@ def index(request):
 def dashboard(request):
     if request.user.is_anonymous:
         return redirect("/")
-
-    # Query to get the latest entry for each user
-    latest_entries = MacbookInventry.objects.values('deviceuser_id').annotate(
-        latest_created_at=Max('created_at')
-    )
-
-    # Retrieve the complete objects corresponding to the latest entries
-    macbookInventry = [
-        MacbookInventry.objects.filter(deviceuser_id=entry['deviceuser_id'],
-                                       created_at=entry['latest_created_at']).first()
-        for entry in latest_entries
-    ]
-
-    # macbookInventry = MacbookInventry.objects.all()
-    return render(request, 'dashboard.html', {'macbookInventrys': macbookInventry})
+ 
+    last_entries_ids = MacbookInventry.objects.filter(
+        Q(delivery_datetime__isnull=True) | Q(status=3) | Q(status=1)
+    ).values('deviceuser_id').annotate(
+        max_id=Max('id')
+    ).values_list('max_id', flat=True)
+ 
+    # Retrieve the MacbookInventry objects corresponding to the last entries
+    macbookInventry = MacbookInventry.objects.filter(id__in=last_entries_ids).order_by('-id')
+    return render(request, 'dashboard.html', {'macbookInventrys': macbookInventry})   
 
 
 # Code to logout 
@@ -63,7 +59,7 @@ def logout_view(request):
 def list_inventry(request):
     if request.user.is_anonymous:
         return redirect("/")
-    inventries = Inventry.objects.all()
+    inventries = Inventry.objects.all().order_by('-id')
     return render(request, 'inventry.html', {'inventries': inventries})
 
 
@@ -415,10 +411,18 @@ def assign_macbook(request):
         deviceuser.status = userstatus
         deviceuser.save()
 
-        # Optionally, you can return a success message
-        success_message = "MacBook assign successfully."
+        # Optionally, you can return a success message       
+        success_message = "Data submitted successfully."
         messages.success(request, success_message)
-        return redirect('dashboard')
+        if status == 1:
+            return redirect('dashboard')
+        else:
+            response_data = {
+                'message': 'Data submitted successfully',
+            }
+            return JsonResponse(response_data)
+    
+        
 
     return render(request, 'assign_macbook.html', {'deviceusers':deviceusers, 'laptops':laptops, 'adapters':adapters})
 
