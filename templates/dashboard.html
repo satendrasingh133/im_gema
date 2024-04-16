@@ -70,7 +70,7 @@
         <tbody>
         {% for macbookInventry in macbookInventrys %}
           <tr>
-            <td>1</td>
+            <td>{{ forloop.counter }}</td>
             <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
             <td>
               {{macbookInventry.macbook_id | get_devicename_from_id}}
@@ -85,7 +85,7 @@
             <td>
                 {% if macbookInventry.shipment_datetime %}
                     {% if macbookInventry.delivery_datetime %}
-                        Delivered
+                        Delevered
                     {% else %}
                         On the way
                     {% endif %}
@@ -101,10 +101,17 @@
               <a href="{% url 'update_macbook' macbookInventry.id %}" class="btn btn-primary btn-sm">
                   Update
               </a>
+              {% if macbookInventry.shipment_datetime %}
+              {% if macbookInventry.delivery_datetime %}
               <a href="javascript:void(0)" id="openModalLink" onclick="openModalLink('{{macbookInventry.id}}')" class="btn btn-primary btn-sm">
-                  Action
-              </a>
-                 <button type="button" class="btn btn-primary btn-sm" onclick="openDetailModal('{{macbookInventry.deviceuser_id}}')">
+                Action
+            </a>
+              {% endif %}
+          {% endif %}
+
+
+
+              <button type="button" class="btn btn-primary btn-sm" onclick="openDetailModal('{{macbookInventry.deviceuser_id}}')">
                 Detail
             </button>
             </td>
@@ -118,6 +125,8 @@
     </div>
   </div>
 </div>
+
+
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -127,6 +136,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modal_body">
+                Modal Content Goes Here
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -143,6 +153,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" id="modal_bodyBig">
+              Modal Content Goes Here
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -151,12 +162,8 @@
   </div>
 </div>
 
-
-
-
-
 <script>
-    function openDetailModal(id) {
+function openDetailModal(id) {
     $('#myModalBig').modal('show');
     $.ajax({
         url: '/get_user_data/',
@@ -193,6 +200,7 @@
         }
     });
     }
+
   $(document).ready(function() {
     // Initialize DataTable
     $('#inventoryTable').DataTable();
