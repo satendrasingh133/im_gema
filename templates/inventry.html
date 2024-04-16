@@ -36,6 +36,7 @@
     <table id="inventoryTable" class="table table-striped">
         <thead>
             <tr>
+                <th>S. No</th>
                 <th>Type</th>
                 <th>Name</th>
                 <th>Serial Number</th>
@@ -46,6 +47,7 @@
         <tbody>
             {% for inventry in inventries %}
             <tr>
+                <td>{{ forloop.counter }}</td>
                 <td>{{ inventry.type|capfirst }}</td>
                 <td>{{ inventry.name }}</td>
                 <td>{{ inventry.serial_no }}</td>

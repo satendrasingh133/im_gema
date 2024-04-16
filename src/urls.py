@@ -19,8 +19,8 @@ urlpatterns = [
     path('assign_macbook/', views.assign_macbook, name='assign_macbook'),
     path('logout/', views.logout_view, name='logout'),
     path('update_macbook/<int:id>/', views.update_macbook_by_id, name='update_macbook'),
-    path('update_macbook_by_id/', views.update_macbook, name='update_macbook_by_id'),
-    path('render_demo_html/', views.render_demo_html, name='render_demo_html'),
+    path('update_macbook_by_id/', views.update_assign_macbook, name='update_macbook_by_id'),
+    path('render_modal_html/', views.render_modal_html, name='render_modal_html'),
     path('get_user_data/', views.get_user_data, name='get_user_data'),
 ]
 

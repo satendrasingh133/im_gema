@@ -73,9 +73,13 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
             <td>
+
               {{macbookInventry.macbook_id | get_devicename_from_id}}
               <br>
               {{ macbookInventry.macbook_id | get_deviceserial_no_from_id}}
+
+
+
             </td>
            <td>
               {{macbookInventry.usb_id | get_devicename_from_id}}
@@ -132,7 +136,6 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal Title</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modal_body">
@@ -163,6 +166,10 @@
 </div>
 
 <script>
+
+
+
+
 function openDetailModal(id) {
     $('#myModalBig').modal('show');
     $.ajax({
@@ -182,10 +189,13 @@ function openDetailModal(id) {
     });
 }
 
+
+
+
     function openModalLink(id){
         $('#myModal').modal('show');
     $.ajax({
-        url: '/render_demo_html/',
+        url: '/render_modal_html/',
         type: 'GET',
         data: {
             id: id
@@ -200,6 +210,8 @@ function openDetailModal(id) {
         }
     });
     }
+
+
 
   $(document).ready(function() {
     // Initialize DataTable
