@@ -7,6 +7,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', views.index, name="index"),
     path('inventry/', views.list_inventry, name="list_inventry"),
+    path('inventryType/', views.inventry_type, name="inventry_type"),
+    path('addInventryType/', views.addinventry_type, name="addinventry_type"),
+    path('getInventryTypeById/<int:inventryType_id>/', views.getInventryTypeById, name="getInventryTypeById"),
     path('dashboard/', views.dashboard, name="dashboard"),
     path('addinventry/', views.add_inventry, name="add_inventry"),
     path('update_inventry/<int:inventry_id>/', views.get_inventry_by_id, name="update_inventry"),

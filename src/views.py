@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from datetime import datetime
-from src.models import Inventry, DeviceUser, MacbookInventry
+from src.models import Inventry, DeviceUser, MacbookInventry, InventryType, Photo
 import re
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
@@ -69,76 +69,101 @@ def get_inventry_by_id(request, inventry_id):
         return redirect("/")
     # Retrieve the inventory item by ID or return a 404 error if not found
     inventry = get_object_or_404(Inventry, pk=inventry_id)
-
+    inventrieTypes = InventryType.objects.all()
     # Render the template and pass the inventory item to the context
-    return render(request, 'update_inventry.html', {'inventry': inventry})
+    return render(request, 'update_inventry.html', {'inventry': inventry, 'inventrieTypes':inventrieTypes})
 
 
 # code to add Inventry using modal
 def add_inventry(request):
     if request.user.is_anonymous:
         return redirect("/")
+
+    inventrieTypes = InventryType.objects.all()
     if request.method == "POST":
-        # Get the values from POST data
         type = request.POST.get('type')
         name = request.POST.get('name')
         serial_number = request.POST.get('serial_number')
 
-        # Check if name is empty
+        # Check if name and serial number are provided
         if not name:
             error_message = "Name cannot be empty."
             return render(request, 'add_inventry.html',
-                          {'error_message': error_message, 'type': type, 'name': name, 'serial_number': serial_number})
+                          {'error_message': error_message, 'type': type, 'name': name, 'serial_number': serial_number,
+                           'inventrieTypes': inventrieTypes})
+
         if not serial_number:
             error_message = "Serial No cannot be empty."
             return render(request, 'add_inventry.html',
-                          {'error_message': error_message, 'type': type, 'name': name, 'serial_number': serial_number})
-        # Check if the name already exists in the database
+                          {'error_message': error_message, 'type': type, 'name': name, 'serial_number': serial_number,
+                           'inventrieTypes': inventrieTypes})
+
+        # Check if the serial number already exists in the database
         if Inventry.objects.filter(serial_no=serial_number).exists():
             error_message = f"A inventry with the Serial no '{serial_number}' already exists."
             return render(request, 'add_inventry.html',
-                          {'error_message': error_message, 'type': type, 'name': name, 'serial_number': serial_number})
+                          {'error_message': error_message, 'type': type, 'name': name, 'serial_number': serial_number,
+                           'inventrieTypes': inventrieTypes})
 
-        # Create Inventry object if name is not empty
-        inventry = Inventry(type=type, name=name, serial_no=serial_number, status=1, device_status="",
-                            created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
-                            updated_by=request.user.username)
+        # Create Inventry object
+        inventry = Inventry(
+            type=type,
+            name=name,
+            serial_no=serial_number,
+            status=1,
+            device_status="",
+            created_by=request.user.username,
+            created_at=datetime.today(),
+            updated_at=datetime.today(),
+            updated_by=request.user.username
+        )
         inventry.save()
+
+        # Handle photo uploads
+        for file in request.FILES.getlist('photo'):
+            photo = Photo(image=file)
+            photo.save()
+            inventry.photo.add(photo)
+
         # Optionally, you can return a success message
         success_message = "Inventry created successfully."
         messages.success(request, success_message)
+
         return redirect('list_inventry')
 
-    return render(request, 'add_inventry.html')
-
+    return render(request, 'add_inventry.html', {'inventrieTypes': inventrieTypes})
 
 # code to update Inventry using id
 def update_inventry_data(request):
     if request.user.is_anonymous:
         return redirect("/")
+    inventry_id = request.POST.get('inventry_id')
+    inventrieTypes = InventryType.objects.all()
+    inventry = get_object_or_404(Inventry, pk=inventry_id)
     if request.method == 'POST':
-        inventry_id = request.POST.get('inventry_id')
         # Retrieve the inventory item by ID or return a 404 error if not found
-        inventry = get_object_or_404(Inventry, pk=inventry_id)
-        type = request.POST.get('type')
-        name = request.POST.get('name')
-        serial_number = request.POST.get('serial_number')
-        status = request.POST.get('status')
-
-        # Update the inventory item with the submitted data
-        inventry.type = type
-        inventry.name = name
-        inventry.serial_no = serial_number
-        inventry.status = status
+        inventry.type = request.POST.get('type')
+        inventry.name = request.POST.get('name')
+        inventry.serial_no = request.POST.get('serial_number')
+        inventry.status = request.POST.get('status')
         inventry.updated_at = datetime.today()
         inventry.updated_by = request.user.username
+        # Handle photo uploads
+        if request.FILES.getlist('photo'):
+            # Clear existing photos associated with the inventry
+            inventry.photo.clear()
+            for file in request.FILES.getlist('photo'):
+                photo = Photo(image=file)
+                photo.save()
+                inventry.photo.add(photo)
+        # Save the updated inventry object
         inventry.save()
         success_message = "Inventry updated successfully."
         messages.success(request, success_message)
         return redirect('list_inventry')
 
     # Render the form template with the inventory item data
-    return render(request, 'update_inventry.html', {'inventry': inventry})
+    return render(request, 'update_inventry.html', {'inventry': inventry, 'inventrieTypes':inventrieTypes})
 
 
 # Code to delete inventry from database
@@ -328,8 +353,8 @@ def assign_macbook(request):
     if request.user.is_anonymous:
         return redirect("/")
     deviceusers = DeviceUser.objects.filter(status=1)
-    laptops = Inventry.objects.filter(type='laptop', status__in=[1, 2])
-    adapters = Inventry.objects.filter(type='adapter', status=1)
+    laptops = Inventry.objects.filter(type='1', status__in=[1, 2])
+    adapters = Inventry.objects.filter(type='3', status=1)
     if request.method == "POST":
         tracking_slip = request.FILES.get('tracking_slpi')
         tracking_slip_path = ""
@@ -464,8 +489,8 @@ def update_macbook_by_id(request, id):
     if request.user.is_anonymous:
         return redirect("/")
     deviceusers = DeviceUser.objects.all()
-    laptops = Inventry.objects.filter(type='laptop')
-    adapters = Inventry.objects.filter(type='adapter')
+    laptops = Inventry.objects.filter(type='1')
+    adapters = Inventry.objects.filter(type='3')
     macbookInventryData = get_object_or_404(MacbookInventry, pk=id)
     return render(request, 'update_macbook.html',
                   {'macbookInventryData': macbookInventryData, 'deviceusers': deviceusers, 'laptops': laptops,
@@ -567,3 +592,49 @@ def get_user_data(request):
     # Filter MacbookInventry objects based on the user's ID
     macbookInventry = MacbookInventry.objects.filter(deviceuser_id=user_id)
     return render(request, 'user_data.html', {'macbookInventrys': macbookInventry})
+
+def inventry_type(request):
+    if request.user.is_anonymous:
+        return redirect("/")
+    inventrieTypes = InventryType.objects.all().order_by('-id')
+    return render(request, 'inventry_type.html', {'inventrieTypes': inventrieTypes})
+
+def addinventry_type(request):
+    if request.user.is_anonymous:
+        return redirect("/")
+    if request.method == "POST":
+        # Get the values from POST data
+        name = request.POST.get('name')
+        # Check if name is empty
+        inventryType = {
+            'name': name,
+        }
+        if not name:
+            error_message = "Name cannot be empty."
+            return render(request, 'addinventry_type.html',
+                          {'error_message': error_message, 'type': type, 'inventryType': inventryType})
+        # Create Inventry object if name is not empty
+        inventryType = InventryType(name=name, created_by=request.user.username, created_at=datetime.today(), updated_at=datetime.today(),
+                            updated_by=request.user.username)
+        inventryType.save()
+        # Optionally, you can return a success message
+        success_message = "Inventry type created successfully."
+        messages.success(request, success_message)
+        return redirect('inventry_type')
+    return render(request, 'addinventry_type.html')
+
+def getInventryTypeById(request, inventryType_id):
+    if request.user.is_anonymous:
+        return redirect("/")
+    inventryType = InventryType.objects.get(pk=inventryType_id)
+    if request.method == 'POST':
+        # Get form data
+        name = request.POST.get('name')
+        inventryType.name = name
+        inventryType.updated_at = datetime.today()
+        inventryType.updated_by = request.user.username
+        inventryType.save()
+        success_message = "Inventry type Updated successfully."
+        messages.success(request, success_message)
+        return redirect('inventry_type')
+    return render(request, 'addinventry_type.html', {'inventryType':inventryType})

@@ -9,6 +9,17 @@ class Inventry(models.Model):
     serial_no = models.CharField(max_length=122)
     status = models.IntegerField()
     device_status = models.CharField(max_length=122)
+    photo = models.ManyToManyField('Photo')
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=122)
+    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.CharField(max_length=122)
+
+class Photo(models.Model):
+    image = models.ImageField(upload_to='inventory_photos/')
+
+class InventryType(models.Model):
+    name = models.CharField(max_length=122)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=122)
     updated_at = models.DateTimeField(auto_now_add=True)

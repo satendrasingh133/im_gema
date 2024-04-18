@@ -7,15 +7,17 @@
         }
         $('select#type').change(function(){
             var selectedOption = $(this).children("option:selected").val();
-            if(selectedOption === 'laptop' || selectedOption === 'adapter') {
+            if(selectedOption != '') {
                 $('#inventryForm').show();
             } else {
                 $('#inventryForm').hide();
             }
-            if(selectedOption === 'laptop'){
+            if(selectedOption === '1'){
                 $('#name').val("Macbook Pro");
-            }else{
+            }else if(selectedOption === '3'){
                 $('#name').val("Multiport Adapter");
+            }else{
+                $('#name').val("");
             }
         });
     });
@@ -35,28 +37,32 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 {% endif %}
-<form method="POST" action="/addinventry/">
+<form method="POST" action="/addinventry/" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
         <div class="col-6">
             <label class="form-label">Type <span class="text-danger">*</span></label>
-            <select class="form-select" name="type" id="type" aria-label="type">
-              <option selected value="">Please select</option>
-              <option {% if type == "laptop" %} selected {% endif %} value="laptop">Laptop</option>
-              <option {% if type == "adapter" %} selected {% endif %} value="adapter">Adapter</option>
+            <select id="type" name="type" class="form-control" required>
+                <option value="">Select State</option>
+                {% for inventrieType in inventrieTypes %}
+                    <option value={{inventrieType.id}}>{{inventrieType.name}}</option>
+                {% endfor %}
             </select>
         </div>
     </div>
     <div id="inventryForm" class="mt-4" style="display: none">
         <div class="row">
-            <div class="col-6">
+            <div class="col-4">
                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                 <input type="text" required class="form-control" name="name" {% if name != "" %} value="{{ name }}" {% endif %} id="name" aria-describedby="nameHelp">
-
             </div>
-            <div class="col-6">
+            <div class="col-4">
                 <label for="serial_number" class="form-label">Serial number <span class="text-danger">*</span></label>
                 <input type="text" required class="form-control" name="serial_number" {% if serial_number != "" %} value="{{ serial_number }}" {% endif %} id="serial_number" oninput="this.value = this.value.toUpperCase()" aria-describedby="snumberHelp">
+            </div>
+            <div class="col-4">
+                <label for="serial_number" class="form-label">Photo</label>
+                <input type="file" class="form-control" multiple name="photo" {% if photo != "" %} value="{{ photo }}" {% endif %} id="photo" aria-describedby="snumberphoto">
             </div>
         </div>
         <div class="row">
