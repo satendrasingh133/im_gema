@@ -94,7 +94,7 @@
         <form method="POST" action="/logout/">
           <span>{{request.user.username}}</span>
           {% csrf_token %}
-          <button type="submit" >Logout</button>
+          <button type="submit" class="btn btn-primary">Logout</button>
         </form>
       </div>
     </nav>
