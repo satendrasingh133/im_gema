@@ -7,7 +7,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total Laptops</h5>
-          <span class="badge badge-primary badge-pill">{{ "laptop" | get_total }}</span>
+          <span class="badge badge-primary badge-pill">{{ "1" | get_total }}</span>
         </div>
       </div>
     </div>
@@ -15,7 +15,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Total Adapters</h5>
-          <span class="badge badge-primary badge-pill">{{ "adapter" | get_total }}</span>
+          <span class="badge badge-primary badge-pill">{{ "3" | get_total }}</span>
         </div>
       </div>
     </div>
@@ -23,7 +23,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Available Laptops</h5>
-          <span class="badge badge-primary badge-pill">{{ "laptop" | get_available }}</span>
+          <span class="badge badge-primary badge-pill">{{ "1" | get_available }}</span>
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Available Adapters</h5>
-          <span class="badge badge-primary badge-pill">{{ "adapter" | get_available }}</span>
+          <span class="badge badge-primary badge-pill">{{ "3" | get_available }}</span>
         </div>
       </div>
     </div>
@@ -73,13 +73,9 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ macbookInventry.deviceuser_id|get_username_from_id }}</td>
             <td>
-
               {{macbookInventry.macbook_id | get_devicename_from_id}}
               <br>
               {{ macbookInventry.macbook_id | get_deviceserial_no_from_id}}
-
-
-
             </td>
            <td>
               {{macbookInventry.usb_id | get_devicename_from_id}}
@@ -94,7 +90,6 @@
                         On the way
                     {% endif %}
                 {% endif %}
-
             </td>
            <td>
               {% if macbookInventry.photo %}
@@ -112,9 +107,6 @@
             </a>
               {% endif %}
           {% endif %}
-
-
-
               <button type="button" class="btn btn-primary btn-sm" onclick="openDetailModal('{{macbookInventry.deviceuser_id}}')">
                 Detail
             </button>

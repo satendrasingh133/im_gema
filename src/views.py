@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 import os
 from urllib.parse import urlparse
+from django.conf import settings
 
 
 # code to check the login status of user if not then redirect to login page
@@ -150,8 +151,6 @@ def update_inventry_data(request):
         inventry.updated_by = request.user.username
         # Handle photo uploads
         if request.FILES.getlist('photo'):
-            # Clear existing photos associated with the inventry
-            inventry.photo.clear()
             for file in request.FILES.getlist('photo'):
                 photo = Photo(image=file)
                 photo.save()
@@ -638,3 +637,21 @@ def getInventryTypeById(request, inventryType_id):
         messages.success(request, success_message)
         return redirect('inventry_type')
     return render(request, 'addinventry_type.html', {'inventryType':inventryType})
+
+def delete_photo(request):
+    if request.method == 'POST':
+        photo_id = request.POST.get('photo_id')
+        try:
+            photo = Photo.objects.get(id=photo_id)
+            # Get the path of the photo file
+            photo_path = os.path.join(settings.MEDIA_ROOT, str(photo.image))
+            # Delete the photo file from the folder
+            if os.path.exists(photo_path):
+                os.remove(photo_path)
+            # Delete the photo object from the database
+            photo.delete()
+            return JsonResponse({'message': 'Photo deleted successfully.'}, status=200)
+        except Photo.DoesNotExist:
+            return JsonResponse({'message': 'Photo does not exist.'}, status=404)
+    else:
+        return JsonResponse({'message': 'Invalid request.'}, status=400)
