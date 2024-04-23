@@ -186,21 +186,21 @@ function openDetailModal(id) {
 
     function openModalLink(id){
         $('#myModal').modal('show');
-    $.ajax({
-        url: '/render_modal_html/',
-        type: 'GET',
-        data: {
-            id: id
-        },
-        success: function(response) {
-            // Populate the modal body with the response HTML
-            $('#modal_body').html(response);
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-            alert('Error occurred while loading modal content');
-        }
-    });
+        $.ajax({
+            url: '/render_modal_html/',
+            type: 'GET',
+            data: {
+                id: id
+            },
+            success: function(response) {
+                // Populate the modal body with the response HTML
+                $('#modal_body').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                alert('Error occurred while loading modal content');
+            }
+        });
     }
 
 
